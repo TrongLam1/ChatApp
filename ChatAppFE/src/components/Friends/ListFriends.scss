@@ -1,0 +1,157 @@
+.list-friends-container {
+    flex: 1;
+    overflow-y: auto;
+
+    .search {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+
+        .search-bar {
+            flex: 1;
+            background-color: rgba(17, 25, 40, .5);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 5px;
+            border-radius: 10px;
+
+            i {
+                font-size: 1rem;
+                color: white;
+                padding-left: 5px;
+            }
+
+            input {
+                background-color: transparent;
+                border: none;
+                outline: none;
+                color: white;
+                flex: 1;
+                font-size: .8rem;
+            }
+        }
+
+        .add {
+            font-size: 1.1rem;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            cursor: pointer;
+            background-color: rgba(17, 25, 40, .5);
+            border-radius: 10px;
+            border-style: none;
+
+            &:active {
+                border-style: none;
+            }
+
+            i {
+                color: white;
+            }
+        }
+    }
+
+    .tab {
+        color: white;
+        padding: 0 20px 10px;
+        display: flex;
+        font-size: .8rem;
+        justify-content: space-between;
+        border-bottom: 1px solid #1a73e8;
+
+        button {
+            border-radius: 10px;
+            outline: none;
+            border: none;
+            padding: 4px 15px;
+            font-weight: bold;
+
+            &.active {
+                background-color: #1a73e8;
+                color: white;
+            }
+
+            &:hover {
+                background-color: #1a73e8;
+                color: white;
+            }
+        }
+    }
+
+    .list-chats {
+
+        .friend {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #dddddd35;
+
+            img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .accept-info {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .texts {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                color: white;
+
+                span {
+                    font-weight: 500;
+                }
+
+                p {
+                    font-size: 14px;
+                    font-weight: 300;
+                    margin: 0;
+                }
+            }
+
+            .action {
+                display: flex;
+                gap: 3px;
+
+                .accept {
+
+                    &:hover {
+                        color: #00b600;
+                    }
+                }
+
+                .deny {
+
+                    &:hover {
+                        color: red;
+                    }
+                }
+
+                button {
+                    color: white;
+                    border: none;
+                    outline: none;
+                    background-color: transparent;
+                    font-size: 1.6rem;
+                    border-radius: 50%;
+                }
+            }
+        }
+
+        .no-content {
+            color: white;
+            padding: 20px;
+        }
+    }
+}

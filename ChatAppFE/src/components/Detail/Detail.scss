@@ -1,0 +1,105 @@
+.detail-container {
+    flex: 1;
+    color: white;
+
+    .user {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid #dddddd35;
+
+        h3 {
+            margin: 0;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+    }
+
+    .info {
+        padding: 10px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .option {
+            .title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                img {
+                    width: 30px;
+                    height: 30px;
+                    background-color: rgba(17, 25, 40, .3);
+                    padding: 10px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                }
+
+                span {
+                    font-size: 14px;
+                }
+            }
+
+            .photos {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+
+                .photo-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    .photo-detail {
+                        display: flex;
+                        align-items: center;
+                        gap: 20px;
+
+                        img {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 5px;
+                            object-fit: cover;
+                        }
+
+                        span {
+                            font-size: 14px;
+                            color: lightgray;
+                            font-weight: 300;
+                        }
+                    }
+                }
+            }
+        }
+
+        button {
+            padding: 5px 20px;
+            background-color: rgba(230, 74, 105, .553);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+
+            &:hover {
+                background-color: rgba(220, 20, 60, .796);
+            }
+
+            &.logout {
+                background-color: #1a73e8;
+            }
+        }
+    }
+}
