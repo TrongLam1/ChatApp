@@ -3,12 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { UserContext } from '../../context/UserContext';
+import { WebSocketContext } from '../../context/WebSocketContext';
 import { signIn } from '../../services/AuthenticationService';
 
 const Login = (props) => {
 
     const navigate = useNavigate();
     const { loginContext } = useContext(UserContext);
+    const { setChannelNotify } = useContext(WebSocketContext);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,7 +28,8 @@ const Login = (props) => {
 
         let res = await signIn(email, password);
         if (res && res.status === 200) {
-            loginContext(res.data.name, res.data.token);
+            loginContext(res.data.name, res.data.token, res.data.avatar);
+            setChannelNotify(res.data.userId);
             localStorage.setItem('refreshToken', res.data.refreshToken);
             navigate("/");
         } else {

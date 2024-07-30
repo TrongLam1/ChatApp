@@ -4,8 +4,9 @@ import logo from '../../assets/image/logo.png';
 import { UserContext } from '../../context/UserContext';
 import Friend from './Friend';
 import WaitingAcceptFriend from './WaitingAcceptFriend';
-import AddUser from '../Modal/AddUser';
+import AddUser from '../Modal/AddUser/AddUser';
 import UserInfo from './UserInfo/UserInfo';
+import CreateGroup from '../Modal/CreateGroup/CreateGroup';
 import { useEffect, useState, useContext } from 'react';
 import { fetchListFriends, fetchListFriendsWaitingAccept } from '../../services/FriendshipService';
 import { fetchGroupsFromUser, createNewGroup } from '../../services/GroupService';
@@ -15,7 +16,8 @@ const Friends = (props) => {
     const { setChatWith, tab, setTab } = props;
 
     const { user } = useContext(UserContext);
-    const [openModal, setOpenModal] = useState(false);
+    const [openModalUserInfo, setOpenModalUserInfo] = useState(false);
+    const [openModalCreateGroup, setOpenModalCreateGroup] = useState(false);
     const [listChats, setListChats] = useState([]);
 
     useEffect(() => {
@@ -68,11 +70,18 @@ const Friends = (props) => {
                         <i className="fa-solid fa-magnifying-glass"></i>
                         <input type='text' placeholder='Enter...' />
                     </div>
-                    <button type='button' className='add' onClick={() => setOpenModal((prev) => !prev)}>
-                        {openModal === false ?
-                            <i className="fa-solid fa-plus"></i> :
-                            <i className="fa-solid fa-minus"></i>}
-                    </button>
+                    {tab !== 'groups' ?
+                        (<button type='button' className='add' onClick={() => setOpenModalUserInfo((prev) => !prev)}>
+                            {openModalUserInfo === false ?
+                                <i className="fa-solid fa-plus"></i> :
+                                <i className="fa-solid fa-minus"></i>}
+                        </button>)
+                        :
+                        (<button type='button' className='new-group'
+                            onClick={() => setOpenModalCreateGroup(!openModalCreateGroup)}>
+                            <i className="fa-solid fa-user-group"></i>
+                        </button>)
+                    }
                 </div>
                 <div className='tab'>
                     <div>
@@ -102,7 +111,9 @@ const Friends = (props) => {
                         }) : <div className='no-content'>No content</div>
                     }
                 </div>
-                {openModal && <AddUser />}
+                {openModalUserInfo && <AddUser />}
+                {openModalCreateGroup && <CreateGroup open={openModalCreateGroup}
+                    setOpen={setOpenModalCreateGroup} />}
             </div>
         </>
     );

@@ -17,22 +17,24 @@ const WaitingAcceptFriend = (props) => {
 
     return (
         <>
-            <div className='friend'>
-                <div className='accept-info'>
-                    <img src={avatar} alt='' />
-                    <div className='texts'>
-                        <span>{item?.userName}</span>
+            {item &&
+                <div className='friend'>
+                    <div className='accept-info'>
+                        <img src={`${item.avatar ? item.avatar : avatar}`} alt='' />
+                        <div className='texts'>
+                            <span>{item?.userName}</span>
+                        </div>
+                    </div>
+                    <div className='action'>
+                        <button type='button' className='accept' onClick={() => handleAcceptFriend()}>
+                            <i className="fa-solid fa-circle-check"></i>
+                        </button>
+                        <button type='button' className='deny' onClick={() => handleDenyAcceptFriend()}>
+                            <i className="fa-solid fa-circle-xmark"></i>
+                        </button>
                     </div>
                 </div>
-                <div className='action'>
-                    <button type='button' className='accept' onClick={() => handleAcceptFriend()}>
-                        <i className="fa-solid fa-circle-check"></i>
-                    </button>
-                    <button type='button' className='deny' onClick={() => handleDenyAcceptFriend()}>
-                        <i className="fa-solid fa-circle-xmark"></i>
-                    </button>
-                </div>
-            </div>
+            }
         </>
     );
 };

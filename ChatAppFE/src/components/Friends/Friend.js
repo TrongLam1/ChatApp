@@ -1,3 +1,4 @@
+import './Friend.scss';
 import avatar from '../../assets/image/avatar.jpg';
 import group from '../../assets/image/group.png';
 import { findChannelByUser } from '../../services/ChannelService';
@@ -9,6 +10,8 @@ import { findGroupById } from '../../services/GroupService';
 const Friend = (props) => {
 
     const { item, setChatWith, tab } = props;
+
+    console.log(item);
 
     const { connectToChannel, handleSetReceiver, handleSetDescription } = useContext(WebSocketContext);
 
@@ -43,7 +46,7 @@ const Friend = (props) => {
         <>
             <div className='friend'
                 onClick={() => { tab === 'friends' ? handleSubscribeChannel(item?.id) : handleSubscribeGroup(item?.groupId) }}>
-                <img src={`${tab === 'friends' ? avatar : group}`} alt='' />
+                <img src={item?.avatar || item?.image_url ? item?.avatar || item?.image_url : avatar} alt='' />
                 <div className='texts'>
                     <div className='info'>
                         <span>{item.userName || item.groupName}</span>

@@ -1,0 +1,64 @@
+.modal-upload-img {
+    min-width: 400px;
+    width: max-content;
+    height: max-content;
+    padding: 25px;
+    background-color: rgba(1, 1, 2, 0.781);
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    color: white;
+
+    .img-preview {
+        text-align: center;
+        position: relative;
+
+        img {
+            border-radius: 5px;
+            transition: 0.3s;
+            width: 100%;
+            max-width: 200px;
+            max-height: 300px;
+        }
+
+        i {
+            font-size: 2rem;
+            position: absolute;
+            right: 0;
+        }
+    }
+
+    .btn {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+
+        &:active {
+            border-color: transparent;
+        }
+
+        .btn-upload-img,
+        .btn-send-img {
+            text-align: center;
+
+            input {
+                display: none;
+            }
+
+            label,
+            p {
+                background-color: white;
+                color: black;
+                padding: 5px 20px;
+                border-radius: 10px;
+                font-size: .9rem;
+                font-weight: bold;
+                cursor: pointer;
+            }
+        }
+    }
+}

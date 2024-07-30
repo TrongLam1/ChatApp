@@ -19,7 +19,8 @@ const Message = (props) => {
             {message.sender !== user.username && <img src={avatar} alt='' />}
             <div className='texts'>
                 {tab === 'groups' && <div className='text-sender'>{message.sender}</div>}
-                <p>{message.content}</p>
+                {message.image_url && <img src={message.image_url} alt='img' />}
+                {message.content && <p>{message.content}</p>}
                 <span>{message.createAt}</span>
             </div>
         </div>

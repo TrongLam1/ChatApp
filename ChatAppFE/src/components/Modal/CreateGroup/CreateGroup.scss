@@ -1,0 +1,46 @@
+.modal-create-group {
+    min-width: 400px;
+    width: max-content;
+    height: max-content;
+    padding: 25px;
+    background-color: rgba(17, 25, 40, .781);
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    h4 {
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    form,
+    .btn-create {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+
+        input {
+            flex: 1;
+            outline: none;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            margin-right: 1rem;
+            font-size: .95rem;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            border-radius: 4px;
+            padding: 6px 1rem;
+            font-size: .9rem;
+            background-color: #1a73e8;
+            color: white;
+        }
+    }
+}

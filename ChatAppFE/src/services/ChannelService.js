@@ -22,4 +22,22 @@ const fetchListMessagesFromChannel = (channel) => {
     });
 };
 
-export { findChannelByUser, sendMessageToChannel, fetchListMessagesFromChannel };
+const fetchListMessagesLazy = (channel, page) => {
+    return axios.get(`${basePath}/message/list-messages/${channel}/page/${page}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+};
+
+const sendImageToChannel = (messageRequest) => {
+    return axios.post(`${basePath}/message/private/image`, messageRequest, {
+        headers: {
+            'Content-type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+};
+
+export {
+    findChannelByUser, sendMessageToChannel, fetchListMessagesFromChannel,
+    sendImageToChannel, fetchListMessagesLazy
+};

@@ -20,4 +20,22 @@ const findUsersByName = (name) => {
     });
 };
 
-export { findUserByEmail, findUserById, findUsersByName };
+const changeAvatarUser = (file) => {
+    return axios.post(`${baseUrl}/change-avatar`, file, {
+        headers: {
+            'Content-type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+};
+
+const updateUsername = (username) => {
+    return axios.put(`${baseUrl}/update-username?username=${username}`, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+};
+
+export {
+    findUserByEmail, findUserById, findUsersByName,
+    changeAvatarUser, updateUsername
+};

@@ -34,6 +34,15 @@ const sendMessageToGroup = (messageRequest) => {
     })
 };
 
+const sendImageToGroup = (messageRequest) => {
+    return axios.post(`${baseUrl}/message/private/image`, messageRequest, {
+        headers: {
+            'Content-type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+};
+
 const fetchListMessagesFromGroup = (groupId) => {
     return axios.get(`${baseUrl}/message/list-messages/${groupId}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -42,5 +51,5 @@ const fetchListMessagesFromGroup = (groupId) => {
 
 export {
     fetchGroupsFromUser, fetchMembersOfGroup, createNewGroup, findGroupById,
-    sendMessageToGroup, fetchListMessagesFromGroup
+    sendMessageToGroup, fetchListMessagesFromGroup, sendImageToGroup
 };

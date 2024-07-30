@@ -27,6 +27,19 @@
         display: flex;
         gap: 10px;
         color: white;
+        align-items: center;
+
+        .dropdown {
+            button {
+                background-color: transparent;
+                border: none;
+                padding: 6px 0;
+            }
+
+            .dropdown-menu {
+                max-width: 100px;
+            }
+        }
 
         img {
             width: 20px;

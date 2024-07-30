@@ -38,18 +38,22 @@
                 align-items: center;
                 justify-content: space-between;
 
-                img {
-                    width: 30px;
-                    height: 30px;
-                    background-color: rgba(17, 25, 40, .3);
-                    padding: 10px;
+                i {
+                    font-size: 1.2rem;
+                    background-color: transparent;
+                    padding: 5px;
                     border-radius: 50%;
-                    cursor: pointer;
                 }
 
                 span {
                     font-size: 14px;
                 }
+            }
+
+            .list-members {
+                margin: 5px 0;
+                overflow-y: auto;
+                max-height: 200px;
             }
 
             .photos {
@@ -95,10 +99,6 @@
 
             &:hover {
                 background-color: rgba(220, 20, 60, .796);
-            }
-
-            &.logout {
-                background-color: #1a73e8;
             }
         }
     }

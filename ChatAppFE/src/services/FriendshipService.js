@@ -20,6 +20,12 @@ const denyAcceptFriend = (userId) => {
     });
 };
 
+const cancelAcceptFriend = (userId) => {
+    return axios.delete(`${basePath}/cancel-add-friend/${userId}`, {
+        headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+    });
+};
+
 const fetchListFriends = () => {
     return axios.get(`${basePath}/list-friends`, {
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
@@ -34,5 +40,5 @@ const fetchListFriendsWaitingAccept = () => {
 
 export {
     sendRequestAddFriend, acceptAddFriend, fetchListFriends,
-    fetchListFriendsWaitingAccept, denyAcceptFriend
+    fetchListFriendsWaitingAccept, denyAcceptFriend, cancelAcceptFriend
 };

@@ -37,38 +37,47 @@
             font-size: .9rem;
         }
     }
+}
 
-    .user {
-        margin-top: 30px;
+.user {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .detail {
         display: flex;
+        gap: 20px;
         align-items: center;
-        justify-content: space-between;
+        color: white;
 
-        .detail {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            color: white;
-
-            img {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-            }
+        img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
         }
+    }
 
-        .add-friend-btn {
-            padding: 10px;
-            border-radius: 10px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: .9rem;
+    .no-content {
+        color: white;
+    }
 
-            &:disabled {
-                background-color: #ccc;
-            }
+    .add-friend-btn,
+    .cancel-friend-btn {
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: .9rem;
+
+        &:disabled {
+            background-color: #ccc;
         }
+    }
+
+    .cancel-friend-btn {
+        background-color: rgb(202, 33, 33);
     }
 }

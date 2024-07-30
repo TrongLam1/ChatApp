@@ -1,10 +1,10 @@
+import React from 'react';
 import './Chat.scss';
 import avatar from '../../assets/image/avatar.jpg';
-import bg from '../../assets/image/galaxy.webp';
 import { useEffect, useState, useRef, useContext } from "react";
-import WebSocketService from '../../services/WebSocketService';
-import { sendMessage as sendApiMessage, getMessages } from '../../services/ChatService';
+import { toast } from 'react-toastify';
 import Message from '../Message/Message';
+import UploadImage from '../Modal/UploadImage/UploadImage';
 import { sendMessageToChannel, fetchListMessagesFromChannel } from '../../services/ChannelService';
 import { WebSocketContext } from '../../context/WebSocketContext';
 import { sendMessageToGroup, fetchListMessagesFromGroup } from '../../services/GroupService';
@@ -12,8 +12,9 @@ import { sendMessageToGroup, fetchListMessagesFromGroup } from '../../services/G
 const Chat = (props) => {
 
     const { tab, setChatWith } = props;
-    const { subscribe, receiver, messageReceiver,
-        description, handleSetReceiver, setMessageReceiver } = useContext(WebSocketContext);
+    const { subscribe, receiver, messageReceiver, notifyReceive, description, handleSetReceiver, setMessageReceiver, setNotifyReceive, setDescription } = useContext(WebSocketContext);
+
+    const [open, setOpen] = useState(false);
 
     const [message, setMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
@@ -21,32 +22,35 @@ const Chat = (props) => {
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-
-    }, [chatMessages.length]);
-
-    useEffect(() => {
         handleSetReceiver(null);
         setChatWith(null);
+        setDescription(null);
     }, [tab]);
 
     useEffect(() => {
-        if (subscribe !== "") {
+        if (subscribe) {
             handleGetMessage();
         }
     }, [subscribe]);
 
     useEffect(() => {
         scrollToBottom();
-    }, [chatMessages.length]);
+    }, [chatMessages]);
 
     useEffect(() => {
-        handleGetMessage();
-        setMessageReceiver({
-            sender: '',
-            content: '',
-            createAt: ''
-        });
-    }, [messageReceiver.content]);
+        if (messageReceiver.content) {
+            setChatMessages(prevMessages => [...prevMessages, messageReceiver]);
+            scrollToBottom();
+            setMessageReceiver({ sender: '', content: '', image_url: '', createAt: '' });
+        }
+    }, [messageReceiver]);
+
+    useEffect(() => {
+        if (notifyReceive.sender !== '' && notifyReceive.sender !== receiver) {
+            toast.success("New message from: " + notifyReceive.sender);
+            setNotifyReceive({ sender: '', content: '', createAt: '' });
+        }
+    }, [notifyReceive]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,15 +81,18 @@ const Chat = (props) => {
     };
 
     return (
-        <div className='chat-container col-lg-8'>
-            {receiver &&
+        <>
+            <div className='chat-container col-lg-8'>
+                {/* {receiver &&
+                    
+                } */}
                 <>
                     <div className='top'>
                         <div className='user'>
-                            <img src={avatar} alt='' />
+                            <img src={avatar} alt='avatar' />
                             <div className='texts'>
-                                <span>{receiver}</span>
-                                {tab === 'groups' && <span>{description} members</span>}
+                                <span className='receiver'>{receiver}</span>
+                                {tab === 'groups' && description && <span>{description} members</span>}
                             </div>
                         </div>
                         <div className='icons'>
@@ -101,13 +108,12 @@ const Chat = (props) => {
                                 return (<Message message={message} key={`message-${index}`} tab={tab} />)
                             })
                         }
+                        <div ref={messagesEndRef} />
                     </div>
 
                     <div className='bottom'>
                         <div className='icons'>
-                            <i className="fa-regular fa-image"></i>
-                            <i className="fa-solid fa-camera"></i>
-                            <i className="fa-solid fa-microphone"></i>
+                            <i className="fa-regular fa-image" onClick={() => setOpen(!open)}></i>
                         </div>
                         <input type='text' placeholder='Type a message...' value={message}
                             onChange={(e) => setMessage(e.target.value)}
@@ -120,8 +126,13 @@ const Chat = (props) => {
                         </button>
                     </div>
                 </>
-            }
-        </div>
+            </div>
+            <UploadImage open={open} setOpen={setOpen}
+                subscribe={subscribe}
+                handleGetMessage={handleGetMessage}
+                tab={tab}
+            />
+        </>
     );
 };
 

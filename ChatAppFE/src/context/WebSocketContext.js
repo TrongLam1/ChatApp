@@ -11,6 +11,7 @@ const SOCKET_URL = 'http://localhost:8080/ws';
 const WebSocketProvider = ({ children }) => {
     const clientRef = useRef(null);
     const [subscribe, setSubscribe] = useState('');
+    const [channelNotify, setChannelNotify] = useState('');
     const [receiver, setReceiver] = useState('');
     const [description, setDescription] = useState('');
     const [messageReceiver, setMessageReceiver] = useState({
@@ -18,21 +19,41 @@ const WebSocketProvider = ({ children }) => {
         content: '',
         createAt: ''
     });
+    const [notifyReceive, setNotifyReceive] = useState({
+        sender: '',
+        content: '',
+        createAt: ''
+    });
 
     useEffect(() => {
-        if (subscribe === '') return;
+        if (channelNotify === '') return;
 
         const client = new Client({
             webSocketFactory: () => new SockJS(SOCKET_URL),
             onConnect: (frame) => {
                 console.log('Connected: ' + frame);
-                client.subscribe('/channel/private/' + subscribe, (msg) => {
-                    const message = JSON.parse(msg.body);
-                    setMessageReceiver(prevState => ({
-                        ...prevState,
-                        ...message
-                    }));
-                });
+
+                // Subscribe to the notification channel
+                if (channelNotify !== '') {
+                    client.subscribe(`/channel/notify/${channelNotify}`, (msg) => {
+                        const message = JSON.parse(msg.body);
+                        setNotifyReceive(prevState => ({
+                            ...prevState,
+                            ...message
+                        }));
+                    });
+                }
+
+                // Subscribe to the chatting channel if `subscribe` is set
+                if (subscribe !== '') {
+                    client.subscribe(`/channel/private/${subscribe}`, (msg) => {
+                        const message = JSON.parse(msg.body);
+                        setMessageReceiver(prevState => ({
+                            ...prevState,
+                            ...message
+                        }));
+                    });
+                }
             }
         });
 
@@ -42,7 +63,7 @@ const WebSocketProvider = ({ children }) => {
         return () => {
             client.deactivate();
         };
-    }, [subscribe]);
+    }, [subscribe, channelNotify]);
 
     const connectToChannel = (newChannel) => {
         setSubscribe(newChannel);
@@ -56,14 +77,8 @@ const WebSocketProvider = ({ children }) => {
         setDescription(description);
     };
 
-    const sendMessage = (message) => {
-        if (clientRef.current) {
-            clientRef.current.publish({ destination: '/app/message', body: JSON.stringify(message) });
-        }
-    };
-
     return (
-        <WebSocketContext.Provider value={{ subscribe, receiver, messageReceiver, description, connectToChannel, handleSetReceiver, handleSetDescription, setMessageReceiver }}>
+        <WebSocketContext.Provider value={{ subscribe, receiver, channelNotify, messageReceiver, description, notifyReceive, setDescription, connectToChannel, handleSetReceiver, handleSetDescription, setMessageReceiver, setChannelNotify, setNotifyReceive }}>
             {children}
         </WebSocketContext.Provider>
     );
