@@ -38,6 +38,7 @@ public class FriendshipController {
 	@GetMapping("/list-friends-waiting-accept")
 	public ResponseData<?> getListFriendsWatingAccept(@RequestHeader("Authorization") String token) {
 		try {
+			log.info("List friends waiting accept");
 			String jwtToken = token.substring(7);
 			return new ResponseData<>(HttpStatus.OK.value(), "List friends waiting accept",
 					friendshipService.listUsersWaitingAccept(jwtToken));
@@ -63,9 +64,10 @@ public class FriendshipController {
 	@GetMapping("/add-friend/{friend}")
 	public ResponseData<?> addFriend(@RequestHeader("Authorization") String token, @PathVariable("friend") Integer id) {
 		try {
+			log.info("Add friend");
 			String jwtToken = token.substring(7);
-			friendshipService.acceptAddFriend(jwtToken, id);
-			return new ResponseData<>(HttpStatus.OK.value(), "Add friend");
+			return new ResponseData<>(HttpStatus.OK.value(), "Add friend",
+					friendshipService.acceptAddFriend(jwtToken, id));
 		} catch (Exception e) {
 			log.error("errorMessage={}", e.getMessage(), e.getCause());
 			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
@@ -75,9 +77,23 @@ public class FriendshipController {
 	@DeleteMapping("/deny-add-friend/{friend}")
 	public ResponseData<?> denyAddFriend(@RequestHeader("Authorization") String token, @PathVariable("friend") Integer id) {
 		try {
+			log.info("Deny add friend");
 			String jwtToken = token.substring(7);
-			friendshipService.denyAcceptFriend(jwtToken, id);
-			return new ResponseData<>(HttpStatus.OK.value(), "Deny add friend");
+			return new ResponseData<>(HttpStatus.OK.value(), "Deny add friend",
+					friendshipService.denyAcceptFriend(jwtToken, id));
+		} catch (Exception e) {
+			log.error("errorMessage={}", e.getMessage(), e.getCause());
+			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+		}
+	}
+	
+	@DeleteMapping("/cancel-add-friend/{friend}")
+	public ResponseData<?> cancelAddFriend(@RequestHeader("Authorization") String token, @PathVariable("friend") Integer id) {
+		try {
+			log.info("Cancel add friend");
+			String jwtToken = token.substring(7);
+			return new ResponseData<>(HttpStatus.OK.value(), "Cancel add friend", 
+					friendshipService.cancelAddFriend(jwtToken, id));
 		} catch (Exception e) {
 			log.error("errorMessage={}", e.getMessage(), e.getCause());
 			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());

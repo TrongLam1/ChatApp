@@ -1,6 +1,6 @@
 package com.chat.app.service;
 
-import com.chat.app.modal.Channel;
+import com.chat.app.model.Channel;
 
 public interface IChannelService {
 	

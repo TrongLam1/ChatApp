@@ -1,4 +1,4 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -55,9 +55,9 @@ public class User implements Serializable {
 	@Column(name = "user_name")
 	private String userName;
 	
-	@Column(unique = true)
-	@Pattern(regexp = "\\d{10}")
-	private String phone;
+	private String image_url;
+	
+	private String image_id;
 	
 	@OneToOne(mappedBy = "user")
 	private Account account;

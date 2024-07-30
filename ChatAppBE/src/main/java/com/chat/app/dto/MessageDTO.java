@@ -9,11 +9,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChannelMessagesDTO {
+public class MessageDTO {
 
 	private String sender;
 
 	private String content;
+	
+	private String image_url;
 
 	private String createAt;
 }

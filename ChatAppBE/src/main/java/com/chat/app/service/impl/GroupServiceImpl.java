@@ -1,6 +1,7 @@
 package com.chat.app.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +13,9 @@ import com.chat.app.dto.GroupDTO;
 import com.chat.app.dto.GroupMemberDTO;
 import com.chat.app.exception.GroupException;
 import com.chat.app.exception.UserException;
-import com.chat.app.modal.Group;
-import com.chat.app.modal.GroupMember;
-import com.chat.app.modal.User;
+import com.chat.app.model.Group;
+import com.chat.app.model.GroupMember;
+import com.chat.app.model.User;
 import com.chat.app.repository.GroupMemberRepository;
 import com.chat.app.repository.GroupRepository;
 import com.chat.app.repository.UserRepository;
@@ -102,24 +103,24 @@ public class GroupServiceImpl implements IGroupService {
 		try {
 			String emailCreator = jwtService.extractUsername(token);
 			User creator = userRepository.findByEmail(emailCreator);
-			User friend1 = findUserById(request.getUser1());
-			User friend2 = findUserById(request.getUser2());
 
 			Group newGroup = new Group();
 			newGroup.setGroupId(generateCustomId());
 			newGroup.setCreator(creator);
 			newGroup.setGroupName(request.getGroupName());
+			newGroup.setCreateAt(new Date());
 
 			groupRepository.save(newGroup);
-
+			
 			GroupMember admin = createGroupMember(creator, newGroup);
-			GroupMember member1 = createGroupMember(friend1, newGroup);
-			GroupMember member2 = createGroupMember(friend2, newGroup);
-
 			List<GroupMember> listMembers = new ArrayList<>();
 			listMembers.add(admin);
-			listMembers.add(member1);
-			listMembers.add(member2);
+			
+			for (Integer userId : request.getListFriends()) {
+				User user = findUserById(userId);
+				GroupMember member = createGroupMember(user, newGroup);
+				listMembers.add(member);
+			}
 
 			newGroup.setListMembers(listMembers);
 

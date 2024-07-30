@@ -22,5 +22,5 @@ public class ChannelDTO {
 
 	private UserDTO sender;
 
-	private List<ChannelMessagesDTO> listMessages;
+	private List<MessageDTO> listMessages;
 }

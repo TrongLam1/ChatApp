@@ -1,4 +1,4 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.time.LocalDateTime;
 
@@ -39,6 +39,10 @@ public class GroupMessages {
 	private User sender;
 	
 	private String content;
+	
+	private String image_url;
+	
+	private String image_id;
 	
 	@CreationTimestamp
 	@Setter(value = AccessLevel.NONE)

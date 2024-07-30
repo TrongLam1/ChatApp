@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.chat.app.modal.Group;
-import com.chat.app.modal.GroupMember;
-import com.chat.app.modal.User;
+import com.chat.app.model.Group;
+import com.chat.app.model.GroupMember;
+import com.chat.app.model.User;
 
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMember, String> {

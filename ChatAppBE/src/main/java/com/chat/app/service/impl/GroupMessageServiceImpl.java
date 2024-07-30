@@ -3,18 +3,21 @@ package com.chat.app.service.impl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.chat.app.dto.GroupMessagesDTO;
+import com.chat.app.dto.MessageDTO;
 import com.chat.app.exception.UserException;
-import com.chat.app.modal.Group;
-import com.chat.app.modal.GroupMessages;
-import com.chat.app.modal.User;
+import com.chat.app.model.Group;
+import com.chat.app.model.GroupMember;
+import com.chat.app.model.GroupMessages;
+import com.chat.app.model.User;
 import com.chat.app.repository.GroupMemberRepository;
 import com.chat.app.repository.GroupMessageRepository;
 import com.chat.app.repository.UserRepository;
@@ -23,7 +26,7 @@ import com.chat.app.service.IMessageService;
 
 @Service
 @Transactional
-public class GroupMessageServiceImpl implements IMessageService<GroupMessagesDTO> {
+public class GroupMessageServiceImpl implements IMessageService {
 
 	@Autowired
 	private GroupMessageRepository groupMessageRepository;
@@ -42,6 +45,9 @@ public class GroupMessageServiceImpl implements IMessageService<GroupMessagesDTO
 	
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
+	
+	@Autowired
+	private CloudinaryServiceImpl cloudinaryService;
 	
 	private String generateCustomId() {
 		long count = groupMessageRepository.count();
@@ -63,25 +69,33 @@ public class GroupMessageServiceImpl implements IMessageService<GroupMessagesDTO
 			message.setGroup(group);
 			message.setGroupMessageId(generateCustomId());
 			message.setSender(sender);
+			message.setImage_id(request.getImage_id());
+			message.setImage_url(request.getImage_url());
 			
 			groupMessageRepository.save(message);
 	        
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
 	        String formattedDate = localDateTime.format(formatter);
 			
-			GroupMessagesDTO messageDTO = new GroupMessagesDTO();
+	        MessageDTO messageDTO = new MessageDTO();
 			messageDTO.setCreateAt(formattedDate);
-			messageDTO.setContent(request.getContent());
+			messageDTO.setContent(message.getContent());
 			messageDTO.setSender(sender.getUserName());
+			messageDTO.setImage_url(message.getImage_url());
 			
 			simpMessagingTemplate.convertAndSend("/channel/private/" + group.getGroupId(), messageDTO);
+			for (GroupMember member : group.getListMembers()) {
+				if (!member.getUser().getUserId().equals(sender.getUserId())) {
+					simpMessagingTemplate.convertAndSend("/channel/private/" + member.getUser().getUserId(), messageDTO);
+				}
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<GroupMessagesDTO> getListMessagesFromSubscribe(String token, String subscribelId) {
+	public List<MessageDTO> getListMessagesFromSubscribe(String token, String subscribelId) {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepo.findByEmail(email);
@@ -91,15 +105,16 @@ public class GroupMessageServiceImpl implements IMessageService<GroupMessagesDTO
 					.orElseThrow(() -> new UserException("Not found user in group"));
 			
 			List<GroupMessages> listMessages = group.getListMessages();
-			List<GroupMessagesDTO> listMessagesDTO = listMessages.stream().map(item -> {
+			List<MessageDTO> listMessagesDTO = listMessages.stream().map(item -> {
 				LocalDateTime localDateTime = item.getCreateAt();
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
 		        String formattedDate = localDateTime.format(formatter);
 		        
-		        GroupMessagesDTO messageDTO = new GroupMessagesDTO();
+		        MessageDTO messageDTO = new MessageDTO();
 				messageDTO.setCreateAt(formattedDate);
 				messageDTO.setContent(item.getContent());
 				messageDTO.setSender(item.getSender().getUserName());
+				messageDTO.setImage_url(item.getImage_url());
 				
 				return messageDTO;
 			}).collect(Collectors.toList());
@@ -108,5 +123,24 @@ public class GroupMessageServiceImpl implements IMessageService<GroupMessagesDTO
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
+	}
+
+	@Override
+	public String sendImage(String token, MessageRequest message, MultipartFile file) {
+		try {
+			Map result = cloudinaryService.upload(file);
+			message.setImage_url((String) result.get("url"));
+			message.setImage_id((String) result.get("public_id"));
+			sendMessage(token, message);
+			return "Send img success.";
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+
+	@Override
+	public List<MessageDTO> getListMessagesLazyLoad(String token, String subscribelId, int pageNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import com.chat.app.modal.Account;
+import com.chat.app.model.Account;
 
 public interface IAccountService {
 

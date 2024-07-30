@@ -1,4 +1,4 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.chat.app.modal.enums.Role;
+import com.chat.app.model.enums.Role;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

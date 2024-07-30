@@ -8,9 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.chat.app.modal.Account;
-import com.chat.app.modal.User;
-import com.chat.app.modal.enums.Role;
+import com.chat.app.model.Account;
+import com.chat.app.model.User;
+import com.chat.app.model.enums.Role;
 import com.chat.app.repository.AccountRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.request.AuthenRequest;
@@ -93,6 +93,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 			jwtResponse.setName(account.getUser().getUserName());
 			jwtResponse.setExpiredTime(jwtService.isTokenExpiredTime(jwtToken));
 			jwtResponse.setRole(account.getRole());
+			jwtResponse.setAvatar(account.getUser().getImage_url());
+			jwtResponse.setUserId(account.getUser().getUserId());
 			account.setRefreshToken(refreshToken);
 
 			accountRepo.save(account);

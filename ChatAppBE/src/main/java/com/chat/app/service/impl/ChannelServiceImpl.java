@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chat.app.exception.ChannelException;
-import com.chat.app.modal.Channel;
-import com.chat.app.modal.User;
+import com.chat.app.model.Channel;
+import com.chat.app.model.User;
 import com.chat.app.repository.ChannelRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.service.IChannelService;

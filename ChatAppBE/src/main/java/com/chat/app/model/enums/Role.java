@@ -1,4 +1,4 @@
-package com.chat.app.modal.enums;
+package com.chat.app.model.enums;
 
 public enum Role {
 

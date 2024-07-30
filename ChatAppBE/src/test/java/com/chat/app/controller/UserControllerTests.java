@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.chat.app.modal.enums.StatusFriend;
+import com.chat.app.model.enums.StatusFriend;
 import com.chat.app.response.FriendshipResponse;
 import com.chat.app.service.impl.AccountServiceImpl;
 import com.chat.app.service.impl.JwtServiceImpl;

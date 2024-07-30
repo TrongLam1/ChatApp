@@ -3,7 +3,7 @@ package com.chat.app.response;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.chat.app.modal.enums.Role;
+import com.chat.app.model.enums.Role;
 
 import lombok.Data;
 
@@ -19,9 +19,13 @@ public class JwtAuthenticationResponse implements Serializable {
 	
 	private String refreshToken;
 
+	private Integer userId;
+	
 	private String name;
 	
 	private Date expiredTime;
 	
 	private Role role;
+	
+	private String avatar;
 }

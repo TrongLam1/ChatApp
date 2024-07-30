@@ -1,6 +1,6 @@
 package com.chat.app.response;
 
-import com.chat.app.modal.enums.StatusFriend;
+import com.chat.app.model.enums.StatusFriend;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +20,8 @@ public class FriendshipResponse {
 	private String email;
 	
 	private String userName;
+	
+	private String avatar;
 	
 	private StatusFriend status;
 }

@@ -1,4 +1,4 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.io.Serializable;
 import java.util.Objects;

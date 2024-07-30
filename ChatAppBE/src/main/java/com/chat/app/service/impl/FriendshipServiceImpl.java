@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.chat.app.modal.Friendship;
-import com.chat.app.modal.User;
-import com.chat.app.modal.enums.StatusFriend;
+import com.chat.app.model.Friendship;
+import com.chat.app.model.User;
+import com.chat.app.model.enums.StatusFriend;
 import com.chat.app.repository.FriendshipRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.response.FriendshipResponse;
@@ -69,7 +69,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	}
 
 	@Override
-	public String acceptAddFriend(String token, Integer userId) {
+	public FriendshipResponse acceptAddFriend(String token, Integer userId) {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email);
@@ -84,14 +84,21 @@ public class FriendshipServiceImpl implements IFriendshipService {
 				friendshipRepo.save(friendshipReceiver);
 			}
 			
-			return "Accept friend id " + userId + " success";
+			FriendshipResponse res = new FriendshipResponse();
+			res.setEmail(receiver.getEmail());
+			res.setStatus(StatusFriend.FRIEND);
+			res.setUserName(receiver.getUserName());
+			res.setId(receiver.getUserId());
+			
+			return res;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 	
+	// Cancel add friend from sender request
 	@Override
-	public String denyAcceptFriend(String token, Integer userId) {
+	public FriendshipResponse cancelAddFriend(String token, Integer userId) {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email);
@@ -103,7 +110,39 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			friendshipRepo.delete(friendshipSender);
 			friendshipRepo.delete(friendshipReceiver);
 			
-			return "Deny accept friend id " + userId;
+			FriendshipResponse res = new FriendshipResponse();
+			res.setEmail(receiver.getEmail());
+			res.setStatus(null);
+			res.setUserName(receiver.getUserName());
+			res.setId(receiver.getUserId());
+			
+			return res;
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+	
+	// Cancel add friend from receiver request
+	@Override
+	public FriendshipResponse denyAcceptFriend(String token, Integer userId) {
+		try {
+			String email = jwtService.extractUsername(token);
+			User sender = userRepository.findByEmail(email);
+			User receiver = userRepository.findById(userId).get();
+
+			Friendship friendshipReceiver = friendshipRepo.findByUserAndFriend(sender, receiver).get();
+			Friendship friendshipSender = friendshipRepo.findByUserAndFriend(receiver, sender).get();
+			
+			friendshipRepo.delete(friendshipSender);
+			friendshipRepo.delete(friendshipReceiver);
+			
+			FriendshipResponse res = new FriendshipResponse();
+			res.setEmail(receiver.getEmail());
+			res.setStatus(null);
+			res.setUserName(receiver.getUserName());
+			res.setId(receiver.getUserId());
+			
+			return res;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
@@ -121,6 +160,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
 				res.setEmail(item.getEmail());
 				res.setStatus(StatusFriend.FRIEND);
 				res.setUserName(item.getUserName());
+				if (item.getImage_url() != null) res.setAvatar(item.getImage_url());
 				return res;
 			}).collect(Collectors.toList());
 			return listFriendsDTO;
@@ -141,6 +181,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
 				res.setEmail(item.getEmail());
 				res.setStatus(StatusFriend.WAITING);
 				res.setUserName(item.getUserName());
+				if (item.getImage_url() != null) res.setAvatar(item.getImage_url());
 				return res;
 			}).collect(Collectors.toList());
 			return listFriendsDTO;

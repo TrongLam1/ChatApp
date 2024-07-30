@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.chat.app.modal.Account;
+import com.chat.app.model.Account;
 import com.chat.app.repository.AccountRepository;
 import com.chat.app.service.IAccountService;
 

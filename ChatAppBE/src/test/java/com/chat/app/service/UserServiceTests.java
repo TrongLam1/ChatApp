@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.chat.app.modal.enums.StatusFriend;
+import com.chat.app.model.enums.StatusFriend;
 import com.chat.app.repository.FriendshipRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.response.FriendshipResponse;

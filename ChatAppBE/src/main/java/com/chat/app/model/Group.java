@@ -1,9 +1,8 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -40,9 +39,7 @@ public class Group {
 	@ManyToOne
 	@JoinColumn(name = "creator_id")
 	private User creator;
-	
-	@CreationTimestamp
-	@Setter(value = AccessLevel.NONE)
+
 	private Date createAt;
 	
 	@LastModifiedDate

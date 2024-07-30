@@ -8,9 +8,11 @@ public interface IFriendshipService {
 
 	FriendshipResponse sendAddFriend(String token, Integer toUser);
 	
-	String acceptAddFriend(String token, Integer userId);
+	FriendshipResponse acceptAddFriend(String token, Integer userId);
 	
-	String denyAcceptFriend(String token, Integer userId);
+	FriendshipResponse denyAcceptFriend(String token, Integer userId);
+	
+	FriendshipResponse cancelAddFriend(String token, Integer userId);
 	
 	String blockedUser(String token, Integer userId);
 	

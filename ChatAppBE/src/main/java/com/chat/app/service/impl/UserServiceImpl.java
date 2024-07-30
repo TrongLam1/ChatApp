@@ -2,17 +2,19 @@ package com.chat.app.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.chat.app.dto.UserDTO;
 import com.chat.app.exception.UserException;
-import com.chat.app.modal.Friendship;
-import com.chat.app.modal.User;
+import com.chat.app.model.Friendship;
+import com.chat.app.model.User;
 import com.chat.app.repository.FriendshipRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.response.FriendshipResponse;
@@ -32,6 +34,9 @@ public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private ModelMapper mapper;
+	
+	@Autowired
+	private CloudinaryServiceImpl cloudinaryService;
 
 	@Override
 	public FriendshipResponse findByEmail(String email, String token) {
@@ -61,6 +66,7 @@ public class UserServiceImpl implements IUserService {
 			response.setEmail(email);
 			response.setId(friend.getUserId());
 			response.setUserName(friend.getUserName());
+			if (friend.getImage_url() != null) response.setAvatar(friend.getImage_url());
 
 			return response;
 		} catch (Exception e) {
@@ -92,6 +98,7 @@ public class UserServiceImpl implements IUserService {
 			response.setEmail(friend.getEmail());
 			response.setId(friend.getUserId());
 			response.setUserName(friend.getUserName());
+			if (friend.getImage_url() != null) response.setAvatar(friend.getImage_url());
 
 			return response;
 		} catch (Exception e) {
@@ -123,8 +130,7 @@ public class UserServiceImpl implements IUserService {
 			if (listUsers.size() == 0) {
 				return null;
 			} else {
-				response = listUsers.stream()
-						.filter(item -> !sender.equals(item)).map(item -> {
+				response = listUsers.stream().filter(item -> !sender.equals(item)).map(item -> {
 					if (sender.equals(item))
 						return null;
 					Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, item);
@@ -133,6 +139,7 @@ public class UserServiceImpl implements IUserService {
 					friend.setEmail(item.getEmail());
 					friend.setId(item.getUserId());
 					friend.setUserName(item.getUserName());
+					if (item.getImage_url() != null) friend.setAvatar(item.getImage_url());
 					if (friendship.isEmpty()) {
 						friend.setStatus(null);
 					} else {
@@ -143,6 +150,39 @@ public class UserServiceImpl implements IUserService {
 			}
 
 			return response;
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+
+	@Override
+	public UserDTO updateUsername(String token, String username) {
+		try {
+			String email = jwtService.extractUsername(token);
+			User user = userRepository.findByEmail(email);
+			user.setUserName(username);
+			userRepository.save(user);
+			
+			return mapper.map(user, UserDTO.class);
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+
+	@Override
+	public UserDTO changeAvatar(String token, MultipartFile file) {
+		try {
+			String email = jwtService.extractUsername(token);
+			User user = userRepository.findByEmail(email);
+			
+			if (user.getImage_id() != null) cloudinaryService.delete(user.getImage_id());
+			
+			Map result = cloudinaryService.upload(file);
+			user.setImage_url((String) result.get("url"));
+			user.setImage_id((String) result.get("public_id"));
+			userRepository.save(user);
+			
+			return mapper.map(user, UserDTO.class);
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

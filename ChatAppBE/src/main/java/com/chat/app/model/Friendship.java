@@ -1,4 +1,4 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.time.LocalDateTime;
 
@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.chat.app.modal.enums.StatusFriend;
+import com.chat.app.model.enums.StatusFriend;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

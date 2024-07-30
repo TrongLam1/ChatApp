@@ -16,4 +16,8 @@ public class MessageRequest {
 	private String subscribe;
 
 	private String content;
+	
+	private String image_url;
+	
+	private String image_id;
 }

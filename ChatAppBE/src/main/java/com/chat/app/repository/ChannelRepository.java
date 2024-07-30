@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.chat.app.modal.Channel;
-import com.chat.app.modal.User;
+import com.chat.app.model.Channel;
+import com.chat.app.model.User;
 
 @Repository
 public interface ChannelRepository extends JpaRepository<Channel, String> {

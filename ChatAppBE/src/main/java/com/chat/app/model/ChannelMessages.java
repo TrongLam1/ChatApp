@@ -1,4 +1,4 @@
-package com.chat.app.modal;
+package com.chat.app.model;
 
 import java.time.LocalDateTime;
 
@@ -34,6 +34,10 @@ public class ChannelMessages {
 	private Channel channel;
 	
 	private String content;
+	
+	private String image_url;
+	
+	private String image_id;
 	
 	private LocalDateTime createAt;
 }

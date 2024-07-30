@@ -1,7 +1,9 @@
 package com.chat.app.request;
 
+import java.util.Set;
+
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +18,6 @@ public class CreateGroupRequest {
 	@NotBlank
 	private String groupName;
 	
-	@NotNull
-	private Integer user1;
-	
-	@NotNull
-	private Integer user2;
+	@NotEmpty
+	private Set<Integer> listFriends;
 }
