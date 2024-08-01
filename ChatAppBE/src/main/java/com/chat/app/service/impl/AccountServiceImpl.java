@@ -35,7 +35,6 @@ public class AccountServiceImpl implements IAccountService {
 		try {
 			return accountRepo.findByEmail(email);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new RuntimeException(e.toString());
 		}
 	}

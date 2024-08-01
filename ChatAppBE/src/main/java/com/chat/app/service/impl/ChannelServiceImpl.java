@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chat.app.exception.ChannelException;
+import com.chat.app.exception.UserException;
 import com.chat.app.model.Channel;
 import com.chat.app.model.User;
 import com.chat.app.repository.ChannelRepository;
@@ -51,7 +52,8 @@ public class ChannelServiceImpl implements IChannelService {
 	public String findChannelByUser(String token, Integer receiverId) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User sender = userRepo.findByEmail(email);
+			User sender = userRepo.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
 			User receiver = userRepo.findById(receiverId).get();
 			Optional<Channel> channel = channelRepo.findByReceiverAndSender(sender, receiver);
 

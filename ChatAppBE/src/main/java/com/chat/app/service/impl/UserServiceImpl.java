@@ -48,12 +48,10 @@ public class UserServiceImpl implements IUserService {
 				return response;
 			}
 
-			User sender = userRepository.findByEmail(emailSender);
-			User friend = userRepository.findByEmail(email);
-
-			if (sender == null || friend == null) {
-				throw new RuntimeException("Not found user.");
-			}
+			User sender = userRepository.findByEmail(emailSender)
+					.orElseThrow(() -> new UserException("Not found user " + emailSender));
+			User friend = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
 
 			Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, friend);
 
@@ -80,12 +78,10 @@ public class UserServiceImpl implements IUserService {
 			String emailSender = jwtService.extractUsername(token);
 			FriendshipResponse response = new FriendshipResponse();
 
-			User sender = userRepository.findByEmail(emailSender);
-			User friend = userRepository.findById(userId).get();
-
-			if (sender == null || friend == null) {
-				throw new UserException("Not found user.");
-			}
+			User sender = userRepository.findByEmail(emailSender)
+					.orElseThrow(() -> new UserException("Not found user " + emailSender));
+			User friend = userRepository.findById(userId)
+					.orElseThrow(() -> new UserException("Not found user id " + userId));
 
 			Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, friend);
 
@@ -107,23 +103,11 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public UserDTO findById(Integer userId) {
-		try {
-			User user = userRepository.findById(userId).get();
-			if (user == null) {
-				throw new RuntimeException("Not found user " + userId);
-			}
-			return mapper.map(user, UserDTO.class);
-		} catch (Exception e) {
-			throw new RuntimeException(e.toString());
-		}
-	}
-
-	@Override
 	public List<FriendshipResponse> findByUsername(String token, String username) {
 		try {
 			String emailSender = jwtService.extractUsername(token);
-			User sender = userRepository.findByEmail(emailSender);
+			User sender = userRepository.findByEmail(emailSender)
+					.orElseThrow(() -> new UserException("Not found user " + emailSender));
 
 			List<User> listUsers = userRepository.findByUserNameContaining(username);
 			List<FriendshipResponse> response = new ArrayList<FriendshipResponse>();
@@ -131,8 +115,8 @@ public class UserServiceImpl implements IUserService {
 				return null;
 			} else {
 				response = listUsers.stream().filter(item -> !sender.equals(item)).map(item -> {
-					if (sender.equals(item))
-						return null;
+//					if (sender.equals(item)) return null;
+					
 					Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, item);
 
 					FriendshipResponse friend = new FriendshipResponse();
@@ -159,7 +143,8 @@ public class UserServiceImpl implements IUserService {
 	public UserDTO updateUsername(String token, String username) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User user = userRepository.findByEmail(email);
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
 			user.setUserName(username);
 			userRepository.save(user);
 			
@@ -173,7 +158,8 @@ public class UserServiceImpl implements IUserService {
 	public UserDTO changeAvatar(String token, MultipartFile file) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User user = userRepository.findByEmail(email);
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
 			
 			if (user.getImage_id() != null) cloudinaryService.delete(user.getImage_id());
 			

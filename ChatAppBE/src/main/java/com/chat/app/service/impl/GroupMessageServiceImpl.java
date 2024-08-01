@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.chat.app.dto.MessageDTO;
+import com.chat.app.exception.GroupException;
 import com.chat.app.exception.UserException;
 import com.chat.app.model.Group;
 import com.chat.app.model.GroupMember;
@@ -20,6 +21,7 @@ import com.chat.app.model.GroupMessages;
 import com.chat.app.model.User;
 import com.chat.app.repository.GroupMemberRepository;
 import com.chat.app.repository.GroupMessageRepository;
+import com.chat.app.repository.GroupRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.request.MessageRequest;
 import com.chat.app.service.IMessageService;
@@ -32,7 +34,7 @@ public class GroupMessageServiceImpl implements IMessageService {
 	private GroupMessageRepository groupMessageRepository;
 	
 	@Autowired
-	private GroupServiceImpl groupService;
+	private GroupRepository groupRepo;
 	
 	@Autowired
 	private GroupMemberRepository groupMemberRepository;
@@ -58,9 +60,11 @@ public class GroupMessageServiceImpl implements IMessageService {
 	public void sendMessage(String token, MessageRequest request) {
 		try {
 			String emailSender = jwtService.extractUsername(token);
-			User sender = userRepo.findByEmail(emailSender);
+			User sender = userRepo.findByEmail(emailSender)
+					.orElseThrow(() -> new UserException("Not found user " + emailSender));
 			
-			Group group = groupService.findById(request.getSubscribe());
+			Group group = groupRepo.findById(request.getSubscribe())
+					.orElseThrow(() -> new GroupException("Not found group " + request.getSubscribe()));
 			
 			LocalDateTime localDateTime = LocalDateTime.now();
 			
@@ -72,7 +76,10 @@ public class GroupMessageServiceImpl implements IMessageService {
 			message.setImage_id(request.getImage_id());
 			message.setImage_url(request.getImage_url());
 			
-			groupMessageRepository.save(message);
+			message = groupMessageRepository.save(message);
+			
+			group.setLastMessage(message);
+			groupRepo.save(group);
 	        
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
 	        String formattedDate = localDateTime.format(formatter);
@@ -86,7 +93,7 @@ public class GroupMessageServiceImpl implements IMessageService {
 			simpMessagingTemplate.convertAndSend("/channel/private/" + group.getGroupId(), messageDTO);
 			for (GroupMember member : group.getListMembers()) {
 				if (!member.getUser().getUserId().equals(sender.getUserId())) {
-					simpMessagingTemplate.convertAndSend("/channel/private/" + member.getUser().getUserId(), messageDTO);
+					simpMessagingTemplate.convertAndSend("/channel/notify/" + member.getUser().getUserId(), messageDTO);
 				}
 			}
 		} catch (Exception e) {
@@ -98,8 +105,10 @@ public class GroupMessageServiceImpl implements IMessageService {
 	public List<MessageDTO> getListMessagesFromSubscribe(String token, String subscribelId) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User sender = userRepo.findByEmail(email);
-			Group group = groupService.findById(subscribelId);
+			User sender = userRepo.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
+			Group group = groupRepo.findById(subscribelId)
+					.orElseThrow(() -> new GroupException("Not found group " + subscribelId));
 			
 			groupMemberRepository.findByUserAndGroup(sender, group)
 					.orElseThrow(() -> new UserException("Not found user in group"));
@@ -136,11 +145,5 @@ public class GroupMessageServiceImpl implements IMessageService {
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
-	}
-
-	@Override
-	public List<MessageDTO> getListMessagesLazyLoad(String token, String subscribelId, int pageNo) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

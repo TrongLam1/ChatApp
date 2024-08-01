@@ -14,6 +14,4 @@ public interface IMessageService {
 	String sendImage(String token, MessageRequest message, MultipartFile file);
 	
 	List<MessageDTO> getListMessagesFromSubscribe(String token, String subscribelId);
-	
-	List<MessageDTO> getListMessagesLazyLoad(String token, String subscribelId, int pageNo);
 }

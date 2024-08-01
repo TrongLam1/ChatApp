@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,22 +34,26 @@ public class Group {
 	@Id
 	@Column(name = "group_id")
 	private String groupId;
-	
+
 	private String groupName;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "creator_id")
 	private User creator;
 
 	private Date createAt;
-	
+
 	@LastModifiedDate
 	@Setter(value = AccessLevel.NONE)
 	private Date modifiedDate;
-	
+
 	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
 	private List<GroupMessages> listMessages;
-	
+
 	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
 	private List<GroupMember> listMembers;
+
+	@OneToOne
+    @JoinColumn(name = "last_message_id")
+	private GroupMessages lastMessage;
 }

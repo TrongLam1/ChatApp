@@ -56,20 +56,6 @@ public class ChannelMessageController {
 		}
 	}
 	
-	@GetMapping("/list-messages/{channel}/page/{page}")
-	public ResponseData<?> getListMessagesLazyLoad(@RequestHeader("Authorization") String token,
-			@PathVariable("channel") String channel, @PathVariable("page") int page) {
-		try {
-			log.info("List messages from channel {}", channel);
-			String jwtToken = token.substring(7);
-			return new ResponseData<>(HttpStatus.OK.value(), "List message",
-					channelMessageService.getListMessagesLazyLoad(jwtToken, channel, page));
-		} catch (Exception e) {
-			log.error("errorMessage={}", e.getMessage(), e.getCause());
-			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-		}
-	}
-	
 	@PostMapping("/private/image")
 	public ResponseData<?> uploadImg(@RequestHeader("Authorization") String token,
 			@ModelAttribute MessageRequest message,

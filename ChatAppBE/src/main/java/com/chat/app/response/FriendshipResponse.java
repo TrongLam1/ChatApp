@@ -1,5 +1,6 @@
 package com.chat.app.response;
 
+import com.chat.app.dto.MessageDTO;
 import com.chat.app.model.enums.StatusFriend;
 
 import lombok.AllArgsConstructor;
@@ -24,4 +25,6 @@ public class FriendshipResponse {
 	private String avatar;
 	
 	private StatusFriend status;
+	
+	private MessageDTO lastMessage;
 }

@@ -15,8 +15,6 @@ public interface IUserService {
 	
 	List<FriendshipResponse> findByUsername(String token, String username);
 	
-	UserDTO findById(Integer userId);
-	
 	UserDTO updateUsername(String token, String username);
 	
 	UserDTO changeAvatar(String token, MultipartFile file);

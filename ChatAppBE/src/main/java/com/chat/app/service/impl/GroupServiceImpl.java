@@ -3,6 +3,7 @@ package com.chat.app.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 
 import com.chat.app.dto.GroupDTO;
 import com.chat.app.dto.GroupMemberDTO;
+import com.chat.app.dto.UserDTO;
 import com.chat.app.exception.GroupException;
 import com.chat.app.exception.UserException;
 import com.chat.app.model.Group;
 import com.chat.app.model.GroupMember;
 import com.chat.app.model.User;
+import com.chat.app.model.enums.StatusFriend;
+import com.chat.app.repository.FriendshipRepository;
 import com.chat.app.repository.GroupMemberRepository;
 import com.chat.app.repository.GroupRepository;
 import com.chat.app.repository.UserRepository;
@@ -37,6 +41,9 @@ public class GroupServiceImpl implements IGroupService {
 
 	@Autowired
 	private GroupMemberRepository groupMemberRepository;
+	
+	@Autowired
+	private FriendshipRepository friendshipRepository;
 
 	@Autowired
 	private ModelMapper mapper;
@@ -65,7 +72,7 @@ public class GroupServiceImpl implements IGroupService {
 		try {
 			long countMember = groupMemberRepository.count();
 			String memberId = "member" + countMember;
-
+			
 			GroupMember member = new GroupMember();
 			member.setMemberId(memberId);
 			member.setUser(user);
@@ -83,7 +90,8 @@ public class GroupServiceImpl implements IGroupService {
 	public GroupResponse findGroupById(String token, String groupId) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User user = userRepository.findByEmail(email);
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
 			Group group = findById(groupId);
 			groupMemberRepository.findByUserAndGroup(user, group)
 					.orElseThrow(() -> new UserException("Not found user in group"));
@@ -102,8 +110,8 @@ public class GroupServiceImpl implements IGroupService {
 	public String createGroupChat(String token, CreateGroupRequest request) {
 		try {
 			String emailCreator = jwtService.extractUsername(token);
-			User creator = userRepository.findByEmail(emailCreator);
-
+			User creator = userRepository.findByEmail(emailCreator)
+					.orElseThrow(() -> new UserException("Not found user " + emailCreator));
 			Group newGroup = new Group();
 			newGroup.setGroupId(generateCustomId());
 			newGroup.setCreator(creator);
@@ -133,17 +141,26 @@ public class GroupServiceImpl implements IGroupService {
 	}
 
 	@Override
-	public String addFriendToGroup(Integer userId, String groupId) {
+	public String addFriendsToGroup(String token, Set<Integer> userIds, String groupId) {
 		try {
-			User friend = findUserById(userId);
+			String email = jwtService.extractUsername(token);
+			User inviter = userRepository.findByEmail(email).orElseThrow(() -> new UserException("Not found user"));
 			Group group = findById(groupId);
+			
+			List<GroupMember> listMembers = group.getListMembers();
+			boolean memberInviter = listMembers.stream()
+				    .anyMatch(item -> item.getUser().equals(inviter));
+			if (memberInviter) {
+				for (Integer id : userIds) {
+					User friend = findUserById(id);
+					boolean checkExistedUser = listMembers.stream().anyMatch(item -> item.getUser().equals(friend));
+					if (!checkExistedUser) createGroupMember(friend, group);
+				}
+			} else {
+				new UserException(inviter.getUserName() + " is not member of group");
+			}
 
-			GroupMember member = createGroupMember(friend, group);
-			group.getListMembers().add(member);
-
-			groupRepository.save(group);
-
-			return "Add friend to group " + groupId + " success.";
+			return "Add friends to group " + group.getGroupName() + " success.";
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
@@ -153,7 +170,8 @@ public class GroupServiceImpl implements IGroupService {
 	public List<GroupMemberDTO> getListMembersForGroup(String token, String groupId) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User user = userRepository.findByEmail(email);
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));;
 
 			Group group = findById(groupId);
 			groupMemberRepository.findByUserAndGroup(user, group)
@@ -170,32 +188,58 @@ public class GroupServiceImpl implements IGroupService {
 	}
 
 	@Override
-	public String removeUserFromGroup(Integer userId, String groupId) {
+	public List<GroupDTO> getListGroupsFromUser(String token) {
 		try {
-			Group group = findById(groupId);
-			User user = findUserById(userId);
-			GroupMember member = groupMemberRepository.findByUser(user)
-					.orElseThrow(() -> new UserException("Not found member."));
-			group.getListMembers().remove(member);
-
-			groupMemberRepository.delete(member);
-			groupRepository.save(group);
-
-			return "Remove user success.";
+			String email = jwtService.extractUsername(token);
+			User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException("Not found user " + email));
+			List<Group> listGroups = groupMemberRepository.findListGroupsByUser(user);
+			List<GroupDTO> listGroupsDTO = listGroups.stream().map(item -> mapper.map(item, GroupDTO.class))
+					.collect(Collectors.toList());
+			return listGroupsDTO;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<GroupDTO> getListGroupsFromUser(String token) {
+	public String quitGroup(String token, String groupId) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User user = userRepository.findByEmail(email);
-			List<Group> listGroups = groupMemberRepository.findListGroupsByUser(user);
-			List<GroupDTO> listGroupsDTO = listGroups.stream().map(item -> mapper.map(item, GroupDTO.class))
-					.collect(Collectors.toList());
-			return listGroupsDTO;
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
+			Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException("Not found group " + groupId));
+			GroupMember member = groupMemberRepository.findByUserAndGroup(user, group)
+					.orElseThrow(() -> new UserException("Not found user " + user.getEmail()));
+			groupMemberRepository.delete(member);
+			return "Quit out group " + group.getGroupName();
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+
+	@Override
+	public List<UserDTO> getListUsersToAddGroup(String token, String groupId) {
+		try {
+			String email = jwtService.extractUsername(token);
+			User inviter = userRepository.findByEmail(email).orElseThrow(() -> new UserException("Not found user"));
+			
+			Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException("Not found group"));
+			
+			List<GroupMember> listMembers = group.getListMembers();
+			
+			boolean checkedInviter = listMembers.stream().anyMatch(item -> item.getUser().equals(inviter));
+			if (!checkedInviter) throw new UserException("User is not in group");
+			
+			List<User> listFriends = friendshipRepository.getListFriendsByUserAndStatus(inviter, StatusFriend.FRIEND);
+			List<UserDTO> listFriendsInvite = new ArrayList<UserDTO>();
+			
+			listFriends.stream().forEach(friend -> {
+				if (!listMembers.stream().anyMatch(member -> member.getUser().equals(friend.getAccount().getUser()))) {
+					listFriendsInvite.add(mapper.map(friend.getAccount().getUser(), UserDTO.class));
+				}
+			});
+			
+			return listFriendsInvite;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
