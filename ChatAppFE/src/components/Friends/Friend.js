@@ -1,9 +1,8 @@
 import './Friend.scss';
 import avatar from '../../assets/image/avatar.jpg';
-import group from '../../assets/image/group.png';
 import { findChannelByUser } from '../../services/ChannelService';
 import { WebSocketContext } from '../../context/WebSocketContext';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { findUserById } from '../../services/UserService';
 import { findGroupById } from '../../services/GroupService';
 
@@ -11,9 +10,11 @@ const Friend = (props) => {
 
     const { item, setChatWith, tab } = props;
 
-    console.log(item);
-
     const { connectToChannel, handleSetReceiver, handleSetDescription } = useContext(WebSocketContext);
+
+    const [friend, setFriend] = useState(item);
+
+    useEffect(() => { }, [friend]);
 
     const handleIsFriend = async (userId) => {
         const res = await findUserById(userId);
@@ -50,7 +51,12 @@ const Friend = (props) => {
                 <div className='texts'>
                     <div className='info'>
                         <span>{item.userName || item.groupName}</span>
-                        <p></p>
+                        {item.lastMessage &&
+                            <div className='last-message'>
+                                <p>{tab === 'friends' && item.lastMessage.sender}:</p>
+                                <p>{item.lastMessage.content}</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

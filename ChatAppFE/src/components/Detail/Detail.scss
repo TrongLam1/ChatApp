@@ -48,6 +48,21 @@
                 span {
                     font-size: 14px;
                 }
+
+                .members-container {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+
+                    i {
+                        font-size: .9rem;
+                        cursor: pointer;
+
+                        &:hover {
+                            color: #4f90e6;
+                        }
+                    }
+                }
             }
 
             .list-members {

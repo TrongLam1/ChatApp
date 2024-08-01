@@ -2,14 +2,17 @@ import './Detail.scss';
 import avatar from '../../assets/image/avatar.jpg';
 import group from '../../assets/image/group.png';
 import Friend from '../Friends/Friend';
+import InviteUsers from '../Modal/InviteUsers/InviteUsers';
+import { toast } from 'react-toastify';
 import { findUserById } from '../../services/UserService';
-import { findGroupById, fetchMembersOfGroup } from '../../services/GroupService';
+import { findGroupById, fetchMembersOfGroup, quitOutGroup } from '../../services/GroupService';
 import { useEffect, useState } from 'react';
 
 const Detail = (props) => {
 
     const { chatWith, tab } = props;
 
+    const [openModal, setOpenModal] = useState(false);
     const [userDetail, setUserDetail] = useState('');
     const [isShowMembers, setIsShowMembers] = useState(false);
     const [membersOfGroup, setMembersOfGroup] = useState([]);
@@ -56,8 +59,13 @@ const Detail = (props) => {
         getMembersOfGroup();
     };
 
-    const handleBlockUser = async () => {
-        console.log("block user id ", userDetail.id);
+    const handleQuitOutGroup = async () => {
+        const res = await quitOutGroup(chatWith);
+        if (res && res.status === 200) {
+            setUserDetail();
+            setMembersOfGroup([]);
+            toast.success("Quit out group");
+        }
     };
 
     return (
@@ -80,33 +88,37 @@ const Detail = (props) => {
                                     <span>Privacy & help</span>
                                 </div>
                             </div>
-                            {/* {tab === 'groups' &&
-                                
-                            } */}
-                            <div className='option'>
-                                <div className='title'>
-                                    <span>Members</span>
-                                    <i className={isShowMembers ? "fa-regular fa-circle-down" : "fa-regular fa-circle-up"}
-                                        onClick={showMembersOfGroup}></i>
-                                </div>
-                                {isShowMembers &&
-                                    <div className='list-members'>
-                                        {membersOfGroup && membersOfGroup.length > 0 &&
-                                            membersOfGroup.map((item, index) => {
-                                                return (<Friend key={`members-${index}`} item={item.user} />)
-                                            })
-                                        }
+                            {tab === 'groups' &&
+                                <div className='option'>
+                                    <div className='title'>
+                                        <div className='members-container'>
+                                            <span>Members</span>
+                                            <i className="fa-solid fa-user-plus"
+                                                onClick={() => setOpenModal(!openModal)}
+                                            ></i>
+                                        </div>
+                                        <i className={isShowMembers ? "fa-regular fa-circle-down" : "fa-regular fa-circle-up"}
+                                            onClick={showMembersOfGroup}></i>
                                     </div>
-                                }
-                            </div>
-                            {tab === 'friends' ?
-                                <button type='button' onClick={handleBlockUser}>Block user</button> :
-                                <button type='button' onClick={handleBlockUser}>Quit</button>
+                                    {isShowMembers &&
+                                        <div className='list-members'>
+                                            {membersOfGroup && membersOfGroup.length > 0 &&
+                                                membersOfGroup.map((item, index) => {
+                                                    return (<Friend key={`members-${index}`} item={item.user} />)
+                                                })
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            {tab === 'groups' &&
+                                <button type='button' onClick={handleQuitOutGroup}>Quit</button>
                             }
                         </div>
                     </>
                 }
             </div>
+            <InviteUsers open={openModal} setOpen={setOpenModal} groupId={chatWith} />
         </>
     )
 };

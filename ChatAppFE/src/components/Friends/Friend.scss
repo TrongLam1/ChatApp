@@ -5,6 +5,7 @@
     padding: 10px 20px;
     cursor: pointer;
     border-bottom: 1px solid #dddddd35;
+    height: 80px;
 
     img {
         width: 50px;
@@ -25,14 +26,27 @@
         gap: 10px;
         color: white;
 
-        span {
-            font-weight: 500;
-        }
+        .info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
 
-        p {
-            font-size: 14px;
-            font-weight: 300;
-            margin: 0;
+            span {
+                font-weight: 500;
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 14px;
+                font-weight: 300;
+                color: #ccc;
+                margin: 0;
+            }
+
+            .last-message {
+                display: flex;
+                gap: 3px;
+            }
         }
     }
 

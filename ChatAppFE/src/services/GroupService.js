@@ -26,6 +26,12 @@ const fetchMembersOfGroup = (groupId) => {
     });
 };
 
+const fetchFriendsToInvite = (groupId) => {
+    return axios.get(`${baseUrl}/list-friends-invite/${groupId}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+};
+
 const sendMessageToGroup = (messageRequest) => {
     return axios.post(`${baseUrl}/message/private`, messageRequest, {
         headers: {
@@ -49,7 +55,20 @@ const fetchListMessagesFromGroup = (groupId) => {
     });
 };
 
+const addUsersToGroup = (groupId, userIds) => {
+    return axios.put(`${baseUrl}/add-user-to-group/${groupId}?users=${userIds}`, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+};
+
+const quitOutGroup = (groupId) => {
+    return axios.delete(`${baseUrl}/quit-group/${groupId}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+};
+
 export {
     fetchGroupsFromUser, fetchMembersOfGroup, createNewGroup, findGroupById,
-    sendMessageToGroup, fetchListMessagesFromGroup, sendImageToGroup
+    sendMessageToGroup, fetchListMessagesFromGroup, sendImageToGroup,
+    addUsersToGroup, quitOutGroup, fetchFriendsToInvite
 };

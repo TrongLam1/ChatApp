@@ -25,6 +25,7 @@ const Chat = (props) => {
         handleSetReceiver(null);
         setChatWith(null);
         setDescription(null);
+        setChatMessages([]);
     }, [tab]);
 
     useEffect(() => {

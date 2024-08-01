@@ -15,7 +15,7 @@ const Message = (props) => {
     };
 
     return (
-        <div className={`message ${message.sender === user.username ? 'own' : 'friend'}`}>
+        <div className={`message ${message.sender === user.username ? 'own' : 'friend-mess'}`}>
             {message.sender !== user.username && <img src={avatar} alt='' />}
             <div className='texts'>
                 {tab === 'groups' && <div className='text-sender'>{message.sender}</div>}
