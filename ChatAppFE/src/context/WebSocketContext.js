@@ -24,6 +24,7 @@ const WebSocketProvider = ({ children }) => {
         content: '',
         createAt: ''
     });
+    const [notifyAddFriend, setNotifyAddFriend] = useState('');
 
     useEffect(() => {
         if (channelNotify === '') return;
@@ -41,6 +42,13 @@ const WebSocketProvider = ({ children }) => {
                             ...prevState,
                             ...message
                         }));
+                    });
+                }
+
+                if (channelNotify !== '') {
+                    client.subscribe(`/channel/notify/add-friend/${channelNotify}`, (msg) => {
+                        const message = msg.body;
+                        setNotifyAddFriend(message);
                     });
                 }
 
@@ -78,7 +86,7 @@ const WebSocketProvider = ({ children }) => {
     };
 
     return (
-        <WebSocketContext.Provider value={{ subscribe, receiver, channelNotify, messageReceiver, description, notifyReceive, setDescription, connectToChannel, handleSetReceiver, handleSetDescription, setMessageReceiver, setChannelNotify, setNotifyReceive }}>
+        <WebSocketContext.Provider value={{ subscribe, receiver, channelNotify, messageReceiver, description, notifyReceive, notifyAddFriend, setDescription, connectToChannel, handleSetReceiver, handleSetDescription, setMessageReceiver, setChannelNotify, setNotifyReceive, setNotifyAddFriend }}>
             {children}
         </WebSocketContext.Provider>
     );

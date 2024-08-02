@@ -7,22 +7,40 @@ import WaitingAcceptFriend from './WaitingAcceptFriend';
 import AddUser from '../Modal/AddUser/AddUser';
 import UserInfo from './UserInfo/UserInfo';
 import CreateGroup from '../Modal/CreateGroup/CreateGroup';
+import { toast } from 'react-toastify';
 import { useEffect, useState, useContext } from 'react';
-import { fetchListFriends, fetchListFriendsWaitingAccept } from '../../services/FriendshipService';
-import { fetchGroupsFromUser, createNewGroup } from '../../services/GroupService';
+import {
+    fetchListFriends, fetchListFriendsWaitingAccept,
+    countRequestsAddFriend
+} from '../../services/FriendshipService';
+import { fetchGroupsFromUser } from '../../services/GroupService';
+import { WebSocketContext } from '../../context/WebSocketContext';
 
 const Friends = (props) => {
 
     const { setChatWith, tab, setTab } = props;
 
     const { user } = useContext(UserContext);
+    const { notifyAddFriend, setNotifyAddFriend } = useContext(WebSocketContext);
+
     const [openModalUserInfo, setOpenModalUserInfo] = useState(false);
     const [openModalCreateGroup, setOpenModalCreateGroup] = useState(false);
     const [listChats, setListChats] = useState([]);
+    const [amountAddFriend, setAmountAddFriend] = useState(0);
 
     useEffect(() => {
         handleShowContentForTab();
+        fetchAmountRequestsAddFriend();
     }, [tab]);
+
+    useEffect(() => {
+        if (notifyAddFriend !== '') {
+            toast.success(notifyAddFriend);
+            fetchAmountRequestsAddFriend();
+        }
+
+        return (() => setNotifyAddFriend(''));
+    }, [notifyAddFriend]);
 
     const getListChats = async () => {
         const res = await fetchListFriends();
@@ -42,6 +60,13 @@ const Friends = (props) => {
         const res = await fetchGroupsFromUser();
         if (res && res.status === 200) {
             setListChats(res.data);
+        }
+    };
+
+    const fetchAmountRequestsAddFriend = async () => {
+        const res = await countRequestsAddFriend();
+        if (res && res.status === 200) {
+            setAmountAddFriend(res.data);
         }
     };
 
@@ -92,9 +117,10 @@ const Friends = (props) => {
                         <button className={`${tab === 'groups' ? 'active' : ''}`}
                             onClick={() => setTab('groups')}>Groups</button>
                     </div>
-                    <div>
+                    <div className='amount-add-friend'>
                         <button className={`${tab === 'accepts' ? 'active' : ''}`}
                             onClick={() => setTab('accepts')}>Accepts</button>
+                        <div className='amount'>{amountAddFriend}</div>
                     </div>
                 </div>
                 <div className='list-chats'>

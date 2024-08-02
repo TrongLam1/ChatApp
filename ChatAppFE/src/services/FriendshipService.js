@@ -38,7 +38,13 @@ const fetchListFriendsWaitingAccept = () => {
     });
 };
 
+const countRequestsAddFriend = () => {
+    return axios.get(`${basePath}/count-request-add-friend`, {
+        headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+    });
+};
+
 export {
     sendRequestAddFriend, acceptAddFriend, fetchListFriends,
-    fetchListFriendsWaitingAccept, denyAcceptFriend, cancelAcceptFriend
+    fetchListFriendsWaitingAccept, denyAcceptFriend, cancelAcceptFriend, countRequestsAddFriend
 };

@@ -14,6 +14,7 @@ const UserAddInfo = (props) => {
 
     const handleSendRequestAddFriend = async () => {
         const res = await sendRequestAddFriend(user.id);
+        console.log(res);
         if (res && res.status === 200) {
             setUserInfo(res.data);
         } else {

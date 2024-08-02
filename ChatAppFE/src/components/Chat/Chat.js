@@ -47,7 +47,7 @@ const Chat = (props) => {
     }, [messageReceiver]);
 
     useEffect(() => {
-        if (notifyReceive.sender !== '' && notifyReceive.sender !== receiver) {
+        if (notifyReceive?.sender !== '' && notifyReceive?.sender !== receiver) {
             toast.success("New message from: " + notifyReceive.sender);
             setNotifyReceive({ sender: '', content: '', createAt: '' });
         }
