@@ -4,14 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chat.app.dto.MessageDTO;
-import com.chat.app.dto.UserDTO;
 import com.chat.app.exception.UserException;
 import com.chat.app.model.Channel;
 import com.chat.app.model.Friendship;
@@ -38,9 +36,6 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	
 	@Autowired
 	private ChannelRepository channelRepository;
-	
-	@Autowired
-	private ModelMapper mapper;
 	
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
@@ -79,7 +74,8 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			res.setUserName(receiver.getUserName());
 			res.setId(receiver.getUserId());
 			
-			simpMessagingTemplate.convertAndSend("/channel/notify/" + receiver.getUserId(), mapper.map(sender, UserDTO.class));
+			simpMessagingTemplate
+			.convertAndSend("/channel/notify/add-friend/" + receiver.getUserId(), "A new friend request from " + sender.getUserName());
 			
 			return res;
 		} catch (Exception e) {
@@ -243,6 +239,18 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			friendshipRepo.save(friendshipReceiver);
 			
 			return "Block friend id " + userId + " success.";
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+
+	@Override
+	public int countRequestsAddFriend(String token) {
+		try {
+			String email = jwtService.extractUsername(token);
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
+			return friendshipRepo.countByUserAndStatus(user, StatusFriend.WAITING);
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

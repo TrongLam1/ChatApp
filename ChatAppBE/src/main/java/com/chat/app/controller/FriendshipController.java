@@ -99,4 +99,17 @@ public class FriendshipController {
 			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
 		}
 	}
+	
+	@GetMapping("/count-request-add-friend")
+	public ResponseData<?> countRequestsAddFriends(@RequestHeader("Authorization") String token) {
+		try {
+			log.info("Count requests add friend");
+			String jwtToken = token.substring(7);
+			return new ResponseData<>(HttpStatus.OK.value(), "Count requests add friend", 
+					friendshipService.countRequestsAddFriend(jwtToken));
+		} catch (Exception e) {
+			log.error("errorMessage={}", e.getMessage(), e.getCause());
+			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+		}
+	}
 }

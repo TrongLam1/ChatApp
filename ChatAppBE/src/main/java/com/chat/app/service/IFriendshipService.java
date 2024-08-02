@@ -14,6 +14,8 @@ public interface IFriendshipService {
 	
 	FriendshipResponse cancelAddFriend(String token, Integer userId);
 	
+	int countRequestsAddFriend(String token);
+	
 	String blockedUser(String token, Integer userId);
 	
 	List<FriendshipResponse> listUsersWaitingAccept(String token);

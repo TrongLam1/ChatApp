@@ -25,4 +25,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
 	
 	@Query(value = "SELECT f.user FROM Friendship f WHERE f.friend = :user AND f.status = :status")
 	List<User> getListUsersByFriendAndStatus(@Param("user") User user, @Param("status") StatusFriend status);
+	
+	@Query(value = "SELECT COUNT(f) FROM Friendship f WHERE f.friend = :user AND f.status = :status")
+	int countByUserAndStatus(@Param("user") User user, @Param("status") StatusFriend status);
 }

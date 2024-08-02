@@ -11,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.chat.app.dto.MessageDTO;
 import com.chat.app.dto.UserDTO;
 import com.chat.app.exception.UserException;
+import com.chat.app.model.Channel;
 import com.chat.app.model.Friendship;
 import com.chat.app.model.User;
+import com.chat.app.model.enums.StatusFriend;
+import com.chat.app.repository.ChannelRepository;
 import com.chat.app.repository.FriendshipRepository;
 import com.chat.app.repository.UserRepository;
 import com.chat.app.response.FriendshipResponse;
@@ -28,6 +32,9 @@ public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private FriendshipRepository friendshipRepo;
+	
+	@Autowired
+	private ChannelRepository channelRepository;
 
 	@Autowired
 	private JwtServiceImpl jwtService;
@@ -59,6 +66,18 @@ public class UserServiceImpl implements IUserService {
 				response.setStatus(null);
 			} else {
 				response.setStatus(friendship.get().getStatus());
+				if (friendship.get().getStatus().equals(StatusFriend.FRIEND)) {
+					Channel channel = channelRepository.findByReceiverAndSender(sender, friend).orElse(null);
+					if (channel.getLastMessage() != null) {
+						MessageDTO lastMessageDTO = MessageDTO.builder()
+								.sender(channel.getLastMessage().getSender().getUserName())
+								.content(channel.getLastMessage().getContent())
+								.image_url(channel.getLastMessage().getImage_url())
+								.createAt(channel.getLastMessage().getCreateAt().toString())
+								.build();
+						response.setLastMessage(lastMessageDTO);
+					}
+				}
 			}
 
 			response.setEmail(email);
@@ -89,6 +108,18 @@ public class UserServiceImpl implements IUserService {
 				response.setStatus(null);
 			} else {
 				response.setStatus(friendship.get().getStatus());
+				if (friendship.get().getStatus().equals(StatusFriend.FRIEND)) {
+					Channel channel = channelRepository.findByReceiverAndSender(sender, friend).orElse(null);
+					if (channel.getLastMessage() != null) {
+						MessageDTO lastMessageDTO = MessageDTO.builder()
+								.sender(channel.getLastMessage().getSender().getUserName())
+								.content(channel.getLastMessage().getContent())
+								.image_url(channel.getLastMessage().getImage_url())
+								.createAt(channel.getLastMessage().getCreateAt().toString())
+								.build();
+						response.setLastMessage(lastMessageDTO);
+					}
+				}
 			}
 
 			response.setEmail(friend.getEmail());
@@ -115,8 +146,6 @@ public class UserServiceImpl implements IUserService {
 				return null;
 			} else {
 				response = listUsers.stream().filter(item -> !sender.equals(item)).map(item -> {
-//					if (sender.equals(item)) return null;
-					
 					Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, item);
 
 					FriendshipResponse friend = new FriendshipResponse();
