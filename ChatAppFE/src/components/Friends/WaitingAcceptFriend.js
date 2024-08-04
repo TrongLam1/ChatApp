@@ -1,18 +1,29 @@
 import avatar from '../../assets/image/avatar.jpg';
 import { acceptAddFriend, denyAcceptFriend } from '../../services/FriendshipService';
+import { toast } from 'react-toastify';
 
 const WaitingAcceptFriend = (props) => {
 
-    const { item, getListChatsWaitingAccept } = props;
+    const { item, getListChatsWaitingAccept, refreshAmountRequest } = props;
 
     const handleAcceptFriend = async () => {
         const res = await acceptAddFriend(item.id);
-        if (res.status === 200) getListChatsWaitingAccept();
+        if (res.status === 200) {
+            getListChatsWaitingAccept();
+            refreshAmountRequest();
+        } else {
+            toast.error(res.message);
+        }
     };
 
     const handleDenyAcceptFriend = async () => {
         const res = await denyAcceptFriend(item.id);
-        if (res.status === 200) getListChatsWaitingAccept();
+        if (res.status === 200) {
+            getListChatsWaitingAccept();
+            refreshAmountRequest();
+        } else {
+            toast.error(res.message);
+        }
     };
 
     return (

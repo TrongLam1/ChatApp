@@ -44,7 +44,13 @@ const countRequestsAddFriend = () => {
     });
 };
 
+const findFriendByUsername = (username) => {
+    return axios.get(`${basePath}/find-friend-by-username/${username}`, {
+        headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+    });
+};
+
 export {
-    sendRequestAddFriend, acceptAddFriend, fetchListFriends,
+    sendRequestAddFriend, acceptAddFriend, fetchListFriends, findFriendByUsername,
     fetchListFriendsWaitingAccept, denyAcceptFriend, cancelAcceptFriend, countRequestsAddFriend
 };

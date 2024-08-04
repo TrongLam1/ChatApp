@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import { useEffect, useState, useContext } from 'react';
 import {
     fetchListFriends, fetchListFriendsWaitingAccept,
-    countRequestsAddFriend
+    countRequestsAddFriend, findFriendByUsername
 } from '../../services/FriendshipService';
 import { fetchGroupsFromUser } from '../../services/GroupService';
 import { WebSocketContext } from '../../context/WebSocketContext';
@@ -23,6 +23,7 @@ const Friends = (props) => {
     const { user } = useContext(UserContext);
     const { notifyAddFriend, setNotifyAddFriend } = useContext(WebSocketContext);
 
+    const [username, setUsername] = useState('');
     const [openModalUserInfo, setOpenModalUserInfo] = useState(false);
     const [openModalCreateGroup, setOpenModalCreateGroup] = useState(false);
     const [listChats, setListChats] = useState([]);
@@ -70,6 +71,17 @@ const Friends = (props) => {
         }
     };
 
+    const handleFindFriendByUsername = async (e) => {
+        if (e.key === 'Enter') {
+            if (username !== '') {
+                const res = await findFriendByUsername(username);
+                if (res && res.status === 200) setListChats(res.data);
+            } else {
+                getListChats();
+            }
+        };
+    };
+
     const handleShowContentForTab = async () => {
         switch (tab) {
             case 'friends':
@@ -92,8 +104,12 @@ const Friends = (props) => {
                 <UserInfo user={user} />
                 <div className='search'>
                     <div className='search-bar'>
-                        <i className="fa-solid fa-magnifying-glass"></i>
-                        <input type='text' placeholder='Enter...' />
+                        <i className="fa-solid fa-magnifying-glass" onClick={handleFindFriendByUsername} />
+                        <input type='text' placeholder='Enter username...'
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            onKeyDown={handleFindFriendByUsername}
+                        />
                     </div>
                     {tab !== 'groups' ?
                         (<button type='button' className='add' onClick={() => setOpenModalUserInfo((prev) => !prev)}>
@@ -129,6 +145,7 @@ const Friends = (props) => {
                             return tab === 'accepts' ?
                                 (<WaitingAcceptFriend item={item} key={`friend-${index}`}
                                     getListChatsWaitingAccept={getListChatsWaitingAccept}
+                                    refreshAmountRequest={fetchAmountRequestsAddFriend}
                                 />)
                                 :
                                 (<Friend item={item} key={`friend-${index}`} tab={tab}

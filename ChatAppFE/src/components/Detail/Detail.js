@@ -1,7 +1,7 @@
 import './Detail.scss';
 import avatar from '../../assets/image/avatar.jpg';
 import group from '../../assets/image/group.png';
-import Friend from '../Friends/Friend';
+import MemberGroup from './MemberGroup/MemberGroup';
 import InviteUsers from '../Modal/InviteUsers/InviteUsers';
 import { toast } from 'react-toastify';
 import { findUserById } from '../../services/UserService';
@@ -23,6 +23,9 @@ const Detail = (props) => {
         } else {
             fetchGroupDetail();
         }
+        setIsShowMembers(false);
+
+        return (() => setMembersOfGroup([]));
     }, [chatWith]);
 
     const fetchUserDetail = async () => {
@@ -104,7 +107,10 @@ const Detail = (props) => {
                                         <div className='list-members'>
                                             {membersOfGroup && membersOfGroup.length > 0 &&
                                                 membersOfGroup.map((item, index) => {
-                                                    return (<Friend key={`members-${index}`} item={item.user} />)
+                                                    return (<MemberGroup
+                                                        key={`members-${index}`} item={item}
+                                                        groupId={chatWith}
+                                                        refreshMembers={getMembersOfGroup} />)
                                                 })
                                             }
                                         </div>

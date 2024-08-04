@@ -61,6 +61,12 @@ const addUsersToGroup = (groupId, userIds) => {
     });
 };
 
+const removeMemberFromGroup = (groupId, userId) => {
+    return axios.delete(`${baseUrl}/remove-member-from-group/${groupId}/${userId}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+};
+
 const quitOutGroup = (groupId) => {
     return axios.delete(`${baseUrl}/quit-group/${groupId}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -70,5 +76,5 @@ const quitOutGroup = (groupId) => {
 export {
     fetchGroupsFromUser, fetchMembersOfGroup, createNewGroup, findGroupById,
     sendMessageToGroup, fetchListMessagesFromGroup, sendImageToGroup,
-    addUsersToGroup, quitOutGroup, fetchFriendsToInvite
+    addUsersToGroup, quitOutGroup, fetchFriendsToInvite, removeMemberFromGroup
 };
