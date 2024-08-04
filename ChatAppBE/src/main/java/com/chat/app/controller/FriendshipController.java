@@ -112,4 +112,18 @@ public class FriendshipController {
 			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
 		}
 	}
+	
+	@GetMapping("/find-friend-by-username/{username}")
+	public ResponseData<?> findFriendByUsername(@RequestHeader("Authorization") String token,
+			@PathVariable("username") String username) {
+		try {
+			log.info("Find friend username {}", username);
+			String jwtToken = token.substring(7);
+			return new ResponseData<>(HttpStatus.OK.value(), "Find friend by username", 
+					friendshipService.findFriendInListFriends(jwtToken, username));
+		} catch (Exception e) {
+			log.error("errorMessage={}", e.getMessage(), e.getCause());
+			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+		}
+	}
 }

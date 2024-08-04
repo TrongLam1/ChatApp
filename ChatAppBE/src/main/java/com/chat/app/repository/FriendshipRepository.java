@@ -2,6 +2,7 @@ package com.chat.app.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
 	StatusFriend checkStatusFriend(@Param("user") User user,@Param("friend") User friend);
 	
 	Optional<Friendship> findByUserAndFriend(User user, User friend);
+	
+	@Query(value = "SELECT f FROM Friendship f WHERE f.user = :user")
+	Set<Friendship> getRelationshipFromUser(@Param("user") User user);
 	
 	@Query(value = "SELECT f.friend FROM Friendship f WHERE f.user = :user AND f.status = :status")
 	List<User> getListFriendsByUserAndStatus(@Param("user") User user, @Param("status") StatusFriend status);

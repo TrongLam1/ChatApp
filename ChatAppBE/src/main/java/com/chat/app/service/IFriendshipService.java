@@ -2,6 +2,7 @@ package com.chat.app.service;
 
 import java.util.List;
 
+import com.chat.app.exception.UserException;
 import com.chat.app.response.FriendshipResponse;
 
 public interface IFriendshipService {
@@ -14,7 +15,9 @@ public interface IFriendshipService {
 	
 	FriendshipResponse cancelAddFriend(String token, Integer userId);
 	
-	int countRequestsAddFriend(String token);
+	List<FriendshipResponse> findFriendInListFriends(String token, String username) throws UserException;
+	
+	int countRequestsAddFriend(String token) throws UserException;
 	
 	String blockedUser(String token, Integer userId);
 	

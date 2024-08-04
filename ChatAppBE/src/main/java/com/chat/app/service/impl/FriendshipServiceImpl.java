@@ -2,6 +2,7 @@ package com.chat.app.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,10 +70,10 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			}
 			
 			FriendshipResponse res = new FriendshipResponse();
-			res.setEmail(receiver.getEmail());
-			res.setStatus(StatusFriend.WAITING);
-			res.setUserName(receiver.getUserName());
+			res.setAvatar(receiver.getImage_url());
 			res.setId(receiver.getUserId());
+			res.setUserName(receiver.getUserName());
+			res.setStatus(StatusFriend.WAITING);
 			
 			simpMessagingTemplate
 			.convertAndSend("/channel/notify/add-friend/" + receiver.getUserId(), "A new friend request from " + sender.getUserName());
@@ -101,7 +102,6 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			}
 			
 			FriendshipResponse res = new FriendshipResponse();
-			res.setEmail(receiver.getEmail());
 			res.setStatus(StatusFriend.FRIEND);
 			res.setUserName(receiver.getUserName());
 			res.setId(receiver.getUserId());
@@ -128,10 +128,10 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			friendshipRepo.delete(friendshipReceiver);
 			
 			FriendshipResponse res = new FriendshipResponse();
-			res.setEmail(receiver.getEmail());
-			res.setStatus(null);
-			res.setUserName(receiver.getUserName());
+			res.setAvatar(receiver.getImage_url());
 			res.setId(receiver.getUserId());
+			res.setUserName(receiver.getUserName());
+			res.setStatus(null);
 			
 			return res;
 		} catch (Exception e) {
@@ -155,10 +155,10 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			friendshipRepo.delete(friendshipReceiver);
 			
 			FriendshipResponse res = new FriendshipResponse();
-			res.setEmail(receiver.getEmail());
-			res.setStatus(null);
-			res.setUserName(receiver.getUserName());
+			res.setAvatar(receiver.getImage_url());
 			res.setId(receiver.getUserId());
+			res.setUserName(receiver.getUserName());
+			res.setStatus(null);
 			
 			return res;
 		} catch (Exception e) {
@@ -170,30 +170,32 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	public List<FriendshipResponse> listFriendsByUser(String token) {
 		try {
 			String email = jwtService.extractUsername(token);
-			User user = userRepository.findByEmail(email)
-					.orElseThrow(() -> new UserException("Not found user " + email));
-			List<User> listFriends = friendshipRepo.getListFriendsByUserAndStatus(user, StatusFriend.FRIEND);
-			List<FriendshipResponse> listFriendsDTO = listFriends.stream().map(item -> {
-				FriendshipResponse res = new FriendshipResponse();
-				Channel channel = channelRepository.findByReceiverAndSender(item.getAccount().getUser(), user).orElse(null);
-				if (channel.getLastMessage() != null) {
-					MessageDTO lastMessageDTO = MessageDTO.builder()
-							.sender(channel.getLastMessage().getSender().getUserName())
-							.content(channel.getLastMessage().getContent())
-							.image_url(channel.getLastMessage().getImage_url())
-							.createAt(channel.getLastMessage().getCreateAt().toString())
-							.build();
-					res.setLastMessage(lastMessageDTO);
-				}
-				
-				res.setId(item.getUserId());
-				res.setEmail(item.getEmail());
-				res.setStatus(StatusFriend.FRIEND);
-				res.setUserName(item.getUserName());
-				if (item.getImage_url() != null) res.setAvatar(item.getImage_url());
-				return res;
-			}).collect(Collectors.toList());
-			return listFriendsDTO;
+	        User user = userRepository.findByEmail(email)
+	                .orElseThrow(() -> new UserException("Not found user " + email));
+	        
+	        List<User> listFriends = friendshipRepo.getListFriendsByUserAndStatus(user, StatusFriend.FRIEND);
+	        
+	        return listFriends.stream().map(item -> {
+	            FriendshipResponse res = new FriendshipResponse();
+	            Channel channel = channelRepository.findByReceiverAndSender(item.getAccount().getUser(), user).orElse(null);
+
+	            if (channel != null && channel.getLastMessage() != null) {
+	                MessageDTO lastMessageDTO = MessageDTO.builder()
+	                        .sender(channel.getLastMessage().getSender().getUserName())
+	                        .content(channel.getLastMessage().getContent())
+	                        .image_url(channel.getLastMessage().getImage_url())
+	                        .createAt(channel.getLastMessage().getCreateAt().toString())
+	                        .build();
+	                res.setLastMessage(lastMessageDTO);
+	            }
+
+	            res.setId(item.getUserId());
+	            res.setStatus(StatusFriend.FRIEND);
+	            res.setUserName(item.getUserName());
+	            res.setAvatar(item.getImage_url());
+
+	            return res;
+	        }).collect(Collectors.toList());
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
@@ -206,16 +208,15 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			User user = userRepository.findByEmail(email)
 					.orElseThrow(() -> new UserException("Not found user " + email));
 			List<User> listFriends = friendshipRepo.getListUsersByFriendAndStatus(user, StatusFriend.WAITING);
-			List<FriendshipResponse> listFriendsDTO = listFriends.stream().map(item -> {
+
+			return listFriends.stream().map(item -> {
 				FriendshipResponse res = new FriendshipResponse();
 				res.setId(item.getUserId());
-				res.setEmail(item.getEmail());
 				res.setStatus(StatusFriend.WAITING);
 				res.setUserName(item.getUserName());
 				if (item.getImage_url() != null) res.setAvatar(item.getImage_url());
 				return res;
 			}).collect(Collectors.toList());
-			return listFriendsDTO;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
@@ -245,12 +246,38 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	}
 
 	@Override
-	public int countRequestsAddFriend(String token) {
+	public int countRequestsAddFriend(String token) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User user = userRepository.findByEmail(email)
 					.orElseThrow(() -> new UserException("Not found user " + email));
 			return friendshipRepo.countByUserAndStatus(user, StatusFriend.WAITING);
+		} catch (UserException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new RuntimeException(e.toString());
+		}
+	}
+
+	@Override
+	public List<FriendshipResponse> findFriendInListFriends(String token, String username) throws UserException {
+		try {
+			String email = jwtService.extractUsername(token);
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UserException("Not found user " + email));
+			Set<User> listFriends = friendshipRepo.getListFriendsByUserAndStatus(user, StatusFriend.FRIEND)
+					.stream().collect(Collectors.toSet());
+			return listFriends.stream().filter(friend -> friend.getUserName().equals(username))
+					.map(friend -> {
+						FriendshipResponse res = new FriendshipResponse();
+						res.setStatus(StatusFriend.FRIEND);
+						res.setUserName(friend.getUserName());
+						res.setId(friend.getUserId());
+						
+						return res;
+					}).collect(Collectors.toList());
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

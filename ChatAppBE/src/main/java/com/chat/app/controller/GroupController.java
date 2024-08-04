@@ -119,6 +119,21 @@ public class GroupController {
 		}
 	}
 	
+	@DeleteMapping("/remove-member-from-group/{group}/{user}")
+	public ResponseData<?> removeMemberFromGroup(@RequestHeader("Authorization") String token,
+			@PathVariable("group") String groupId,
+			@PathVariable("user") Integer userId) {
+		try {
+			log.info("Remove member from group {}", groupId);
+			String jwtToken = token.substring(7);
+			return new ResponseData<>(HttpStatus.OK.value(), "Remove member from group", 
+					groupService.removeMemberFromGroup(jwtToken, groupId, userId));
+		} catch (Exception e) {
+			log.error("errorMessage={}", e.getMessage(), e.getCause());
+			return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+		}
+	}
+	
 	@DeleteMapping("/quit-group/{group}")
 	public ResponseData<?> quitGroup(@RequestHeader("Authorization") String token,
 			@PathVariable("group") String groupId) {

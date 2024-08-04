@@ -79,8 +79,7 @@ public class UserServiceImpl implements IUserService {
 					}
 				}
 			}
-
-			response.setEmail(email);
+			
 			response.setId(friend.getUserId());
 			response.setUserName(friend.getUserName());
 			if (friend.getImage_url() != null) response.setAvatar(friend.getImage_url());
@@ -122,7 +121,6 @@ public class UserServiceImpl implements IUserService {
 				}
 			}
 
-			response.setEmail(friend.getEmail());
 			response.setId(friend.getUserId());
 			response.setUserName(friend.getUserName());
 			if (friend.getImage_url() != null) response.setAvatar(friend.getImage_url());
@@ -149,7 +147,6 @@ public class UserServiceImpl implements IUserService {
 					Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, item);
 
 					FriendshipResponse friend = new FriendshipResponse();
-					friend.setEmail(item.getEmail());
 					friend.setId(item.getUserId());
 					friend.setUserName(item.getUserName());
 					if (item.getImage_url() != null) friend.setAvatar(item.getImage_url());

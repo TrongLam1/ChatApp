@@ -87,7 +87,7 @@ public class GroupMessageServiceImpl implements IMessageService {
 	        MessageDTO messageDTO = new MessageDTO();
 			messageDTO.setCreateAt(formattedDate);
 			messageDTO.setContent(message.getContent());
-			messageDTO.setSender(sender.getUserName());
+			messageDTO.setSender(group.getGroupName());
 			messageDTO.setImage_url(message.getImage_url());
 			
 			simpMessagingTemplate.convertAndSend("/channel/private/" + group.getGroupId(), messageDTO);

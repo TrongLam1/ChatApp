@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.chat.app.dto.GroupDTO;
-import com.chat.app.dto.GroupMemberDTO;
 import com.chat.app.dto.UserDTO;
 import com.chat.app.request.CreateGroupRequest;
+import com.chat.app.response.FriendshipResponse;
 import com.chat.app.response.GroupResponse;
 
 public interface IGroupService {
@@ -21,7 +21,9 @@ public interface IGroupService {
 	
 	List<GroupDTO> getListGroupsFromUser(String token);
 	
-	List<GroupMemberDTO> getListMembersForGroup(String token, String groupId);
+	List<FriendshipResponse> getListMembersForGroup(String token, String groupId);
+	
+	String removeMemberFromGroup(String token, String groupId, Integer memberId) throws Exception;
 	
 	String quitGroup(String token, String groupId);
 }

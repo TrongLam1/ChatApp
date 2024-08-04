@@ -77,12 +77,10 @@ public class ChannelServiceImpl implements IChannelService {
 	@Override
 	public Channel findChannelById(String channelId) {
 		try {
-			Channel channel = channelRepo.findById(channelId)
+			return channelRepo.findById(channelId)
 					.orElseThrow(() -> new ChannelException("Not found channel " + channelId));
-			return channel;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
-
 }

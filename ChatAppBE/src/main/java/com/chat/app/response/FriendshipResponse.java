@@ -17,8 +17,6 @@ import lombok.Setter;
 public class FriendshipResponse {
 
 	private Integer id;
-
-	private String email;
 	
 	private String userName;
 	
