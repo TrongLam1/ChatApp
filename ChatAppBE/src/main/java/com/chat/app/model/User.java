@@ -62,10 +62,4 @@ public class User implements Serializable {
 	
 	@OneToOne(mappedBy = "user")
 	private Account account;
-	
-//	@OneToMany(mappedBy = "receiver")
-//    private List<Channel> receivedChannels;
-//
-//    @OneToMany(mappedBy = "sender")
-//    private List<Channel> sentChannels;
 }

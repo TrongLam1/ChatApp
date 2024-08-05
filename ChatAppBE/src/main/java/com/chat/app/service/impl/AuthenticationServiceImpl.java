@@ -66,9 +66,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 				accountRepo.save(account);
 
-				return "Đăng kí tài khoản thành công: " + request.getEmail();
+				return "Successful account registration.";
 			} else {
-				throw new RuntimeException("Email đã được sử dụng.");
+				throw new RuntimeException("Email has been used.");
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
@@ -82,7 +82,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
 			Account account = accountRepo.findByEmail(request.getEmail())
-					.orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản."));
+					.orElseThrow(() -> new RuntimeException("Not found account."));
 
 			var jwtToken = jwtService.generateToken(account);
 			var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), account);
@@ -134,7 +134,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 		try {
 			String email = jwtService.extractUsername(token);
 			Account account = accountRepo.findByEmail(email)
-					.orElseThrow(() -> new RuntimeException("Thông tin người dùng không tồn tại."));
+					.orElseThrow(() -> new RuntimeException("User information does not exist."));
 			account.setRefreshToken(null);
 
 			return "Log out success.";

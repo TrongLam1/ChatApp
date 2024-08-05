@@ -68,7 +68,7 @@ public class UserServiceImpl implements IUserService {
 				response.setStatus(friendship.get().getStatus());
 				if (friendship.get().getStatus().equals(StatusFriend.FRIEND)) {
 					Channel channel = channelRepository.findByReceiverAndSender(sender, friend).orElse(null);
-					if (channel.getLastMessage() != null) {
+					if (channel != null && channel.getLastMessage() != null) {
 						MessageDTO lastMessageDTO = MessageDTO.builder()
 								.sender(channel.getLastMessage().getSender().getUserName())
 								.content(channel.getLastMessage().getContent())
@@ -109,7 +109,7 @@ public class UserServiceImpl implements IUserService {
 				response.setStatus(friendship.get().getStatus());
 				if (friendship.get().getStatus().equals(StatusFriend.FRIEND)) {
 					Channel channel = channelRepository.findByReceiverAndSender(sender, friend).orElse(null);
-					if (channel.getLastMessage() != null) {
+					if (channel != null && channel.getLastMessage() != null) {
 						MessageDTO lastMessageDTO = MessageDTO.builder()
 								.sender(channel.getLastMessage().getSender().getUserName())
 								.content(channel.getLastMessage().getContent())

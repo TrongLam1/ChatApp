@@ -3,6 +3,7 @@ package com.chat.app.service.impl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -112,7 +113,9 @@ public class ChannelMessageServiceImpl implements IMessageService {
 			
 			if (channel.getReceiver().equals(user) || channel.getSender().equals(user)) {
 				List<ChannelMessages> listMessages = channel.getListMessages();
-				listMessagesDTO = listMessages.stream().map(item -> {
+				listMessagesDTO = listMessages.stream()
+						.sorted(Comparator.comparing(ChannelMessages::getCreateAt))
+						.map(item -> {
 					LocalDateTime localDateTime = item.getCreateAt();
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
 			        String formattedDate = localDateTime.format(formatter);

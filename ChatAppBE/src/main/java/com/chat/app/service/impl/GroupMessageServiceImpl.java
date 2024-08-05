@@ -2,6 +2,7 @@ package com.chat.app.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -114,7 +115,10 @@ public class GroupMessageServiceImpl implements IMessageService {
 					.orElseThrow(() -> new UserException("Not found user in group"));
 			
 			List<GroupMessages> listMessages = group.getListMessages();
-			List<MessageDTO> listMessagesDTO = listMessages.stream().map(item -> {
+			
+			return listMessages.stream()
+					.sorted(Comparator.comparing(GroupMessages::getCreateAt))
+					.map(item -> {
 				LocalDateTime localDateTime = item.getCreateAt();
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
 		        String formattedDate = localDateTime.format(formatter);
@@ -127,8 +131,6 @@ public class GroupMessageServiceImpl implements IMessageService {
 				
 				return messageDTO;
 			}).collect(Collectors.toList());
-			
-			return listMessagesDTO;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

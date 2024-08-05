@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.chat.app.exception.ChannelException;
 import com.chat.app.exception.UserException;
 import com.chat.app.model.Channel;
 import com.chat.app.model.User;
@@ -69,16 +68,6 @@ public class ChannelServiceImpl implements IChannelService {
 			}
 
 			return channelId;
-		} catch (Exception e) {
-			throw new RuntimeException(e.toString());
-		}
-	}
-
-	@Override
-	public Channel findChannelById(String channelId) {
-		try {
-			return channelRepo.findById(channelId)
-					.orElseThrow(() -> new ChannelException("Not found channel " + channelId));
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

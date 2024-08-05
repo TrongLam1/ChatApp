@@ -1,6 +1,5 @@
 package com.chat.app.model;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -71,11 +70,6 @@ public class Account implements UserDetails {
 	private Role role;
 	
 	private String refreshToken;
-	
-	private String otp;
-	
-	@Column(name = "otp_expiration_time")
-	private LocalDateTime otpExpirationTime;
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id")

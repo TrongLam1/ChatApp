@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.chat.app.dto.GroupDTO;
+import com.chat.app.dto.MessageDTO;
 import com.chat.app.dto.UserDTO;
 import com.chat.app.exception.GroupException;
 import com.chat.app.exception.UserException;
@@ -96,7 +97,17 @@ public class GroupServiceImpl implements IGroupService {
 			GroupResponse response = new GroupResponse();
 			response.setGroup(mapper.map(group, GroupDTO.class));
 			response.setTotalMembers(group.getListMembers().size());
-
+			
+			if (group.getLastMessage() != null) {
+				MessageDTO messageDTO = new MessageDTO();
+				messageDTO.setContent(group.getLastMessage().getContent());
+				messageDTO.setCreateAt(group.getLastMessage().getCreateAt().toString());
+				messageDTO.setImage_url(group.getLastMessage().getImage_url());
+				messageDTO.setSender(group.getLastMessage().getSender().getUserName());
+				
+				response.getGroup().setLastMessage(messageDTO);
+			}
+			
 			return response;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
@@ -214,7 +225,23 @@ public class GroupServiceImpl implements IGroupService {
 			List<Group> listGroups = groupMemberRepository.findListGroupsByUser(user);
 			
 			return listGroups.stream()
-					.map(item -> mapper.map(item, GroupDTO.class))
+					.map(item -> {
+						GroupDTO dto = new GroupDTO();
+						dto.setGroupId(item.getGroupId());
+						dto.setGroupName(item.getGroupName());
+						
+						if (item.getLastMessage() != null) {
+							MessageDTO messageDTO = new MessageDTO();
+							messageDTO.setContent(item.getLastMessage().getContent());
+							messageDTO.setCreateAt(item.getLastMessage().getCreateAt().toString());
+							messageDTO.setImage_url(item.getLastMessage().getImage_url());
+							messageDTO.setSender(item.getLastMessage().getSender().getUserName());
+							
+							dto.setLastMessage(messageDTO);
+						}
+						
+						return dto;
+					})
 					.collect(Collectors.toList());
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());

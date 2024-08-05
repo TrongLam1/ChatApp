@@ -14,6 +14,6 @@ public class GroupDTO {
 	private String groupId;
 
 	private String groupName;
-
-	private UserDTO creator;
+	
+	private MessageDTO lastMessage;
 }

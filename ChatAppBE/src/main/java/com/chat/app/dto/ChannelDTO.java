@@ -23,4 +23,6 @@ public class ChannelDTO {
 	private UserDTO sender;
 
 	private List<MessageDTO> listMessages;
+	
+	private MessageDTO lastMessage;
 }
