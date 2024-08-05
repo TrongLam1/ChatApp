@@ -38,8 +38,8 @@ const CreateGroup = (props) => {
     };
 
     const handleCreateNewGroup = async () => {
-        if (listAddGroup.length < 3) {
-            alert("> 2");
+        if (listAddGroup.length < 2) {
+            alert("At least 3 users to create a group");
             return;
         }
         const request = {

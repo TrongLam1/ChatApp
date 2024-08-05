@@ -44,7 +44,7 @@ const Detail = (props) => {
 
     const handleSetAvatar = () => {
         if (tab === 'friends') {
-            return userDetail.avatar ? userDetail.avatar : avatar;
+            return userDetail?.avatar ? userDetail?.avatar : avatar;
         } else if (tab === 'groups') {
             return group;
         }

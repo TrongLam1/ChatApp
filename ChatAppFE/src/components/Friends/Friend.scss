@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 10px 20px;
+    padding: 10px 10px 10px 20px;
     cursor: pointer;
     border-bottom: 1px solid #dddddd35;
     height: 80px;
@@ -25,11 +25,18 @@
         flex-direction: column;
         gap: 10px;
         color: white;
+        width: 100%;
 
         .info {
             display: flex;
             flex-direction: column;
             gap: 10px;
+
+            .title-info {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
             span {
                 font-weight: 500;

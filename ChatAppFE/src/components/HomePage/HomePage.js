@@ -13,19 +13,15 @@ const HomePage = (props) => {
     const [tab, setTab] = useState('friends');
     const [chatWith, setChatWith] = useState('');
 
-    const handleSetChatWithUser = (userId) => {
-        setChatWith(userId);
+    useEffect(() => {
+        checkLogin();
+    }, []);
+
+    const checkLogin = () => {
+        if (user.auth === false) {
+            navigate("/login");
+        };
     };
-
-    // useEffect(() => {
-    //     checkLogin();
-    // }, []);
-
-    // const checkLogin = () => {
-    //     if (user.auth === false) {
-    //         navigate("/login");
-    //     };
-    // };
 
     return (
         <div className='home-page-container'>
@@ -33,7 +29,7 @@ const HomePage = (props) => {
                 setChatWith={setChatWith}
                 tab={tab} setTab={setTab}
             />
-            <Chat setChatWith={setChatWith} tab={tab} />
+            <Chat setChatWith={setChatWith} chatWith={chatWith} tab={tab} />
             <Detail chatWith={chatWith} tab={tab} />
         </div>
     );

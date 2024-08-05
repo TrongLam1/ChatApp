@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react"
 const UserContext = React.createContext({ username: '', avatar: '', auth: false });
 
 const UserProvider = ({ children }) => {
-    const [user, setUser] = useState({ username: "", auth: false });
+    const [user, setUser] = useState({ username: "", avatar: '', auth: false });
 
     useEffect(() => {
         if (localStorage.getItem('username') && localStorage.getItem('token')) {
             setUser((user) => ({
                 username: localStorage.getItem('username'),
-                avatar: '',
+                avatar: localStorage.getItem('avatar'),
                 auth: true,
             }));
         }
@@ -17,6 +17,7 @@ const UserProvider = ({ children }) => {
 
     const loginContext = (username, token, avatar) => {
         localStorage.setItem('token', token);
+        localStorage.setItem('avatar', avatar);
         localStorage.setItem('username', username);
         setUser((user) => ({
             username: username,

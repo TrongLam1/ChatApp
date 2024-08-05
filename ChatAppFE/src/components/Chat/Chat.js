@@ -8,16 +8,18 @@ import UploadImage from '../Modal/UploadImage/UploadImage';
 import { sendMessageToChannel, fetchListMessagesFromChannel } from '../../services/ChannelService';
 import { WebSocketContext } from '../../context/WebSocketContext';
 import { sendMessageToGroup, fetchListMessagesFromGroup } from '../../services/GroupService';
+import { findUserById } from '../../services/UserService';
 
 const Chat = (props) => {
 
-    const { tab, setChatWith } = props;
+    const { tab, setChatWith, chatWith } = props;
     const { subscribe, receiver, messageReceiver, notifyReceive, description, handleSetReceiver, setMessageReceiver, setNotifyReceive, setDescription } = useContext(WebSocketContext);
 
     const [open, setOpen] = useState(false);
 
     const [message, setMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
+    const [userChat, setUserChat] = useState();
 
     const messagesEndRef = useRef(null);
 
@@ -39,7 +41,7 @@ const Chat = (props) => {
     }, [chatMessages]);
 
     useEffect(() => {
-        if (messageReceiver.content) {
+        if (messageReceiver.sender || messageReceiver.image_url) {
             setChatMessages(prevMessages => [...prevMessages, messageReceiver]);
             scrollToBottom();
             setMessageReceiver({ sender: '', content: '', image_url: '', createAt: '' });
@@ -69,6 +71,7 @@ const Chat = (props) => {
             "subscribe": subscribe,
             "content": message,
         };
+        if (message === '') return;
         const res = tab === 'friends' ? await sendMessageToChannel(chatMessage)
             : await sendMessageToGroup(chatMessage);
         setMessage('');
@@ -84,49 +87,48 @@ const Chat = (props) => {
     return (
         <>
             <div className='chat-container col-lg-8'>
-                {/* {receiver &&
-                    
-                } */}
-                <>
-                    <div className='top'>
-                        <div className='user'>
-                            <img src={avatar} alt='avatar' />
-                            <div className='texts'>
-                                <span className='receiver'>{receiver}</span>
-                                {tab === 'groups' && description && <span>{description} members</span>}
+                {receiver &&
+                    <>
+                        <div className='top'>
+                            <div className='user'>
+                                <img src={avatar} alt='avatar' />
+                                <div className='texts'>
+                                    <span className='receiver'>{receiver}</span>
+                                    {tab === 'groups' && description && <span>{description} members</span>}
+                                </div>
+                            </div>
+                            <div className='icons'>
+                                <i className="fa-solid fa-phone"></i>
+                                <i className="fa-solid fa-video"></i>
+                                <i className="fa-solid fa-circle-info"></i>
                             </div>
                         </div>
-                        <div className='icons'>
-                            <i className="fa-solid fa-phone"></i>
-                            <i className="fa-solid fa-video"></i>
-                            <i className="fa-solid fa-circle-info"></i>
-                        </div>
-                    </div>
 
-                    <div className='center'>
-                        {chatMessages && chatMessages.length > 0 &&
-                            chatMessages.map((message, index) => {
-                                return (<Message message={message} key={`message-${index}`} tab={tab} />)
-                            })
-                        }
-                        <div ref={messagesEndRef} />
-                    </div>
-
-                    <div className='bottom'>
-                        <div className='icons'>
-                            <i className="fa-regular fa-image" onClick={() => setOpen(!open)}></i>
+                        <div className='center'>
+                            {chatMessages && chatMessages.length > 0 &&
+                                chatMessages.map((message, index) => {
+                                    return (<Message message={message} key={`message-${index}`} tab={tab} />)
+                                })
+                            }
+                            <div ref={messagesEndRef} />
                         </div>
-                        <input type='text' placeholder='Type a message...' value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            onKeyDown={(e) => handleSubmitMessage(e)}
-                        />
-                        <button className='send-button'
-                            onClick={handleSendMessage}
-                        >
-                            Send
-                        </button>
-                    </div>
-                </>
+
+                        <div className='bottom'>
+                            <div className='icons'>
+                                <i className="fa-regular fa-image" onClick={() => setOpen(!open)}></i>
+                            </div>
+                            <input type='text' placeholder='Type a message...' value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                onKeyDown={(e) => handleSubmitMessage(e)}
+                            />
+                            <button className='send-button'
+                                onClick={handleSendMessage}
+                            >
+                                Send
+                            </button>
+                        </div>
+                    </>
+                }
             </div>
             <UploadImage open={open} setOpen={setOpen}
                 subscribe={subscribe}

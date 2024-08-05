@@ -1,5 +1,6 @@
 import './UserProfile.scss';
 import avatar from '../../../assets/image/avatar.jpg';
+import { toast } from 'react-toastify';
 import { useContext, useState } from 'react';
 import { UserContext } from '../../../context/UserContext';
 import { updateUsername } from '../../../services/UserService';
@@ -14,18 +15,20 @@ const UserProfile = (props) => {
     const [editUsername, setEditUsername] = useState(username);
     const [isEditUsername, setIsEditUsername] = useState(false);
 
-    const [avatarUser, setAvatarUser] = useState(user.avatar);
     const [isUpdateAvatar, setIsUpdateAvatar] = useState(false);
 
     const handleUpdateUsername = async (e) => {
         e.preventDefault();
         const res = username !== editUsername && await updateUsername(editUsername);
         if (res && res.status === 200) {
-            setUser((user) => ({
-                username: res.data.userName,
-                auth: true,
+            toast.success("Successfully updated username");
+            setUser(prevState => ({
+                ...prevState,
+                username: res.data.userName
             }));
             setOpen(false);
+        } else {
+            toast.error(res.message);
         }
     };
 
@@ -41,7 +44,7 @@ const UserProfile = (props) => {
                         <div className='user-info-body'>
                             <div className='avatar-user-container'>
                                 <div className='avatar'>
-                                    <img src={avatarUser} alt='' />
+                                    <img src={user.avatar ? user.avatar : avatar} alt='' />
                                 </div>
                                 <div className='btn-change-avatar'>
                                     <label onClick={() => setIsUpdateAvatar(!isUpdateAvatar)} >
@@ -71,7 +74,7 @@ const UserProfile = (props) => {
                 ) : (
                     <UpdateAvatar
                         setIsUpdateAvatar={setIsUpdateAvatar}
-                        avatarUser={avatarUser} />
+                        avatarUser={user.avatar} />
                 )
             )}
         </>

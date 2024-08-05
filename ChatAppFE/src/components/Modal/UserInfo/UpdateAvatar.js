@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { changeAvatarUser } from '../../../services/UserService';
+import { UserContext } from "../../../context/UserContext";
 
 const UpdateAvatar = (props) => {
 
     const { setIsUpdateAvatar, avatarUser } = props;
+
+    const { setUser } = useContext(UserContext);
+
+    const [loadingApi, setLoadingApi] = useState(false);
 
     const [file, setFile] = useState('');
     const [preview, setPreview] = useState(avatarUser);
@@ -17,9 +22,19 @@ const UpdateAvatar = (props) => {
     const handleUpdateAvatar = async () => {
         const formData = new FormData();
         formData.append('file', file);
+
+        setLoadingApi(true);
+
         const res = await changeAvatarUser(formData);
-        console.log(res);
-        if (res && res.status === 200) { setIsUpdateAvatar(false); }
+        if (res && res.status === 200) {
+            setUser(prevState => ({
+                ...prevState,
+                avatar: res.data.image_url
+            }))
+            setIsUpdateAvatar(false);
+        }
+
+        setLoadingApi(false);
     };
 
     return (
@@ -42,7 +57,10 @@ const UpdateAvatar = (props) => {
                     </div>
                     {file &&
                         <div className="save-avatar">
-                            <button onClick={handleUpdateAvatar}>Save</button>
+                            <button onClick={handleUpdateAvatar} disabled={loadingApi ? true : false}>
+                                {loadingApi && <i className="fa-solid fa-sync fa-spin loader"></i>}
+                                Save
+                            </button>
                         </div>}
                 </div>
             </div>

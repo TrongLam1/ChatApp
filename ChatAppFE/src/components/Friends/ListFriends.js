@@ -150,6 +150,7 @@ const Friends = (props) => {
                                 :
                                 (<Friend item={item} key={`friend-${index}`} tab={tab}
                                     setChatWith={setChatWith}
+                                    handleShowContentForTab={handleShowContentForTab}
                                 />)
                         }) : <div className='no-content'>No content</div>
                     }

@@ -1,6 +1,7 @@
 import './Login.scss';
+import logo from '../../assets/image/logo.png';
 import { useNavigate, Link } from 'react-router-dom';
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { signUp } from '../../services/AuthenticationService';
 
@@ -17,15 +18,20 @@ const SignUp = (props) => {
         e.preventDefault();
 
         if (!email || !password || !username) {
-            toast.error("Vui lòng không để trống.");
+            toast.error("Please do not leave it blank.");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error("Invalid email");
             return;
         }
 
         setLoadingApi(true);
 
         let res = await signUp(username, email, password);
-        if (res) {
-            toast.success("Đăng kí tài khoản thành công.")
+        if (res && res.status === 201) {
+            toast.success("Successful account registration.")
             navigate("/login");
         } else {
             if (res && res.status === 400) {
@@ -38,6 +44,12 @@ const SignUp = (props) => {
         setLoadingApi(false);
     };
 
+    const validateEmail = (email) => {
+        // Regular expression for validating an email
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
     return (
         <>
             <section className="bg-light py-3 py-md-5">
@@ -48,11 +60,11 @@ const SignUp = (props) => {
                                 <div className="card-body p-3 p-md-4 p-xl-5">
                                     <div className="text-center mb-3">
                                         <div>
-                                            <img src="" alt="Logo" width="80" height="80" />
+                                            <img src={logo} alt="Logo" width="80" height="80" />
                                         </div>
                                     </div>
                                     <h2 className="fs-2 fw-bold text-center text-secondary mb-4">
-                                        Đăng kí
+                                        Sign Up
                                     </h2>
                                     <form onSubmit={(e) => handleSignUp(e)}>
                                         <div className="row gy-2 overflow-hidden">
@@ -62,7 +74,7 @@ const SignUp = (props) => {
                                                         onChange={(e) => setUsername(e.target.value)}
                                                         required />
                                                     <label htmlFor="username" className="form-label">
-                                                        Họ và tên
+                                                        Username
                                                     </label>
                                                 </div>
                                             </div>
@@ -78,21 +90,21 @@ const SignUp = (props) => {
                                                 <div className="form-floating mb-3">
                                                     <input type="password" className="form-control" name="password" id="password"
                                                         onChange={(e) => setPassword(e.target.value)}
-                                                        placeholder="Mật khẩu..." required />
-                                                    <label htmlFor="password" className="form-label">Mật khẩu</label>
+                                                        placeholder="Password..." required />
+                                                    <label htmlFor="password" className="form-label">Password</label>
                                                 </div>
                                             </div>
                                             <div className="col-12">
                                                 <div className="d-grid my-3">
                                                     <button className="btn btn-primary btn-lg" type="submit">
                                                         {loadingApi && <i className="fa-solid fa-sync fa-spin loader"></i>}
-                                                        Đăng kí
+                                                        Sign Up
                                                     </button>
                                                 </div>
                                             </div>
                                             <div className="col-12">
-                                                <p className="m-0 text-secondary text-center">Bạn đã có tài khoản?
-                                                    <Link to={'/login'} className="link-primary text-decoration-none"> Đăng nhập</Link>
+                                                <p className="m-0 text-secondary text-center">Do you already have an account?
+                                                    <Link to={'/login'} className="link-primary text-decoration-none"> Sign In</Link>
                                                 </p>
                                             </div>
                                         </div>

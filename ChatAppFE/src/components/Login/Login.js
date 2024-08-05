@@ -1,6 +1,7 @@
 import './Login.scss';
+import logo from '../../assets/image/logo.png';
 import { useNavigate, Link } from 'react-router-dom';
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { UserContext } from '../../context/UserContext';
 import { WebSocketContext } from '../../context/WebSocketContext';
@@ -24,6 +25,11 @@ const Login = (props) => {
             return;
         }
 
+        if (!validateEmail(email)) {
+            toast.error("Invalid email");
+            return;
+        }
+
         setLoadingApi(true);
 
         let res = await signIn(email, password);
@@ -43,6 +49,12 @@ const Login = (props) => {
         setLoadingApi(false);
     };
 
+    const validateEmail = (email) => {
+        // Regular expression for validating an email
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
     return (
         <>
             <section className="bg-light py-3 py-md-5">
@@ -53,11 +65,11 @@ const Login = (props) => {
                                 <div className="card-body p-3 p-md-4 p-xl-5">
                                     <div className="text-center mb-3">
                                         <div>
-                                            <img src="" alt="Logo" width="80" height="80" />
+                                            <img src={logo} alt="Logo" width="80" height="80" />
                                         </div>
                                     </div>
                                     <h2 className="fs-2 fw-bold text-center text-secondary mb-4">
-                                        Đăng nhập
+                                        Sign In
                                     </h2>
                                     <form onSubmit={(e) => handleLogin(e)}>
                                         <div className="row gy-2 overflow-hidden">
@@ -76,30 +88,22 @@ const Login = (props) => {
                                                         className="form-control"
                                                         name="password" id="password"
                                                         onChange={(e) => setPassword(e.target.value)}
-                                                        placeholder="Mật khẩu..." required />
-                                                    <label htmlFor="password" className="form-label">Mật khẩu</label>
-                                                </div>
-                                            </div>
-                                            <div className="col-12">
-                                                <div className="d-flex gap-2 justify-content-between">
-                                                    <div className="form-check">
-
-                                                    </div>
-                                                    <a href="#!" className="link-primary text-decoration-none">Quên mật khẩu?</a>
+                                                        placeholder="Password..." required />
+                                                    <label htmlFor="password" className="form-label">Password</label>
                                                 </div>
                                             </div>
                                             <div className="col-12">
                                                 <div className="d-grid my-3">
                                                     <button className="btn btn-primary btn-lg" type="submit">
                                                         {loadingApi && <i className="fa-solid fa-sync fa-spin loader"></i>}
-                                                        Đăng nhập
+                                                        Sign In
                                                     </button>
                                                 </div>
                                             </div>
                                             <div className="col-12">
                                                 <p className="m-0 text-secondary text-center">
-                                                    Bạn chưa có tài khoản?
-                                                    <Link to={'/register'} className="link-primary text-decoration-none"> Đăng kí</Link>
+                                                    Do not have an account?
+                                                    <Link to={'/register'} className="link-primary text-decoration-none"> Sign Up</Link>
                                                 </p>
                                             </div>
                                         </div>
