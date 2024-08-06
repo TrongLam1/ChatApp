@@ -20,10 +20,10 @@ public class ChannelServiceImpl implements IChannelService {
 
 	@Autowired
 	private ChannelRepository channelRepo;
-	
+
 	@Autowired
 	private UserRepository userRepo;
-	
+
 	@Autowired
 	private JwtServiceImpl jwtService;
 
@@ -48,12 +48,11 @@ public class ChannelServiceImpl implements IChannelService {
 	}
 
 	@Override
-	public String findChannelByUser(String token, Integer receiverId) {
+	public String findChannelByUser(String token, Integer receiverId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
-			User sender = userRepo.findByEmail(email)
-					.orElseThrow(() -> new UserException("Not found user " + email));
-			User receiver = userRepo.findById(receiverId).get();
+			User sender = userRepo.findByEmail(email).orElseThrow(() -> new UserException("Not found user " + email));
+			User receiver = userRepo.findById(receiverId).orElseThrow(() -> new UserException("Not found receiver"));
 			Optional<Channel> channel = channelRepo.findByReceiverAndSender(sender, receiver);
 
 			String channelId = "";
@@ -62,12 +61,14 @@ public class ChannelServiceImpl implements IChannelService {
 			} else {
 				channelId = channel.get().getChannelId();
 			}
-			
+
 			if (channelId == null) {
 				throw new RuntimeException("Not found channel");
 			}
 
 			return channelId;
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

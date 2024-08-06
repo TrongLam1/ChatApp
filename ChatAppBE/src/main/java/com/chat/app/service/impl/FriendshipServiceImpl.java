@@ -42,7 +42,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
 	@Override
-	public FriendshipResponse sendAddFriend(String token, Integer toUser) {
+	public FriendshipResponse sendAddFriend(String token, Integer toUser) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email)
@@ -52,7 +52,8 @@ public class FriendshipServiceImpl implements IFriendshipService {
 				return null;
 			}
 			
-			User receiver = userRepository.findById(toUser).get();
+			User receiver = userRepository.findById(toUser)
+					.orElseThrow(() -> new UserException("Not found receiver"));
 			
 			Optional<Friendship> friendship = friendshipRepo.findByUserAndFriend(sender, receiver);
 			if (friendship.isEmpty()) {
@@ -79,18 +80,21 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			.convertAndSend("/channel/notify/add-friend/" + receiver.getUserId(), "A new friend request from " + sender.getUserName());
 			
 			return res;
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public FriendshipResponse acceptAddFriend(String token, Integer userId) {
+	public FriendshipResponse acceptAddFriend(String token, Integer userId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email)
 					.orElseThrow(() -> new UserException("Not found user " + email));
-			User receiver = userRepository.findById(userId).get();
+			User receiver = userRepository.findById(userId)
+					.orElseThrow(() -> new UserException("Not found receiver"));
 
 			Friendship friendshipReceiver = friendshipRepo.findByUserAndFriend(sender, receiver).get();
 			Friendship friendshipSender = friendshipRepo.findByUserAndFriend(receiver, sender).get();
@@ -107,6 +111,8 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			res.setId(receiver.getUserId());
 			
 			return res;
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
@@ -114,12 +120,13 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	
 	// Cancel add friend from sender request
 	@Override
-	public FriendshipResponse cancelAddFriend(String token, Integer userId) {
+	public FriendshipResponse cancelAddFriend(String token, Integer userId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email)
 					.orElseThrow(() -> new UserException("Not found user " + email));
-			User receiver = userRepository.findById(userId).get();
+			User receiver = userRepository.findById(userId)
+					.orElseThrow(() -> new UserException("Not found receiver"));
 
 			Friendship friendshipReceiver = friendshipRepo.findByUserAndFriend(sender, receiver).get();
 			Friendship friendshipSender = friendshipRepo.findByUserAndFriend(receiver, sender).get();
@@ -134,6 +141,8 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			res.setStatus(null);
 			
 			return res;
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
@@ -141,12 +150,13 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	
 	// Cancel add friend from receiver request
 	@Override
-	public FriendshipResponse denyAcceptFriend(String token, Integer userId) {
+	public FriendshipResponse denyAcceptFriend(String token, Integer userId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email)
 					.orElseThrow(() -> new UserException("Not found user " + email));
-			User receiver = userRepository.findById(userId).get();
+			User receiver = userRepository.findById(userId)
+					.orElseThrow(() -> new UserException("Not found receiver"));
 
 			Friendship friendshipReceiver = friendshipRepo.findByUserAndFriend(sender, receiver).get();
 			Friendship friendshipSender = friendshipRepo.findByUserAndFriend(receiver, sender).get();
@@ -161,13 +171,15 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			res.setStatus(null);
 			
 			return res;
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<FriendshipResponse> listFriendsByUser(String token) {
+	public List<FriendshipResponse> listFriendsByUser(String token) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 	        User user = userRepository.findByEmail(email)
@@ -177,7 +189,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
 	        
 	        return listFriends.stream().map(item -> {
 	            FriendshipResponse res = new FriendshipResponse();
-	            Channel channel = channelRepository.findByReceiverAndSender(item.getAccount().getUser(), user).orElse(null);
+	            Channel channel = channelRepository.findByReceiverAndSender(item, user).orElse(null);
 
 	            if (channel != null && channel.getLastMessage() != null) {
 	                MessageDTO lastMessageDTO = MessageDTO.builder()
@@ -196,13 +208,15 @@ public class FriendshipServiceImpl implements IFriendshipService {
 
 	            return res;
 	        }).collect(Collectors.toList());
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<FriendshipResponse> listUsersWaitingAccept(String token) {
+	public List<FriendshipResponse> listUsersWaitingAccept(String token) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User user = userRepository.findByEmail(email)
@@ -217,13 +231,15 @@ public class FriendshipServiceImpl implements IFriendshipService {
 				if (item.getImage_url() != null) res.setAvatar(item.getImage_url());
 				return res;
 			}).collect(Collectors.toList());
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public String blockedUser(String token, Integer userId) {
+	public String blockedUser(String token, Integer userId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User sender = userRepository.findByEmail(email)
@@ -240,6 +256,8 @@ public class FriendshipServiceImpl implements IFriendshipService {
 			friendshipRepo.save(friendshipReceiver);
 			
 			return "Block friend id " + userId + " success.";
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}

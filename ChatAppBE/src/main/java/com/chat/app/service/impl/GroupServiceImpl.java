@@ -85,7 +85,7 @@ public class GroupServiceImpl implements IGroupService {
 	}
 
 	@Override
-	public GroupResponse findGroupById(String token, String groupId) {
+	public GroupResponse findGroupById(String token, String groupId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User user = userRepository.findByEmail(email)
@@ -115,7 +115,7 @@ public class GroupServiceImpl implements IGroupService {
 	}
 
 	@Override
-	public String createGroupChat(String token, CreateGroupRequest request) {
+	public String createGroupChat(String token, CreateGroupRequest request) throws UserException {
 		try {
 			String emailCreator = jwtService.extractUsername(token);
 			User creator = userRepository.findByEmail(emailCreator)
@@ -143,13 +143,15 @@ public class GroupServiceImpl implements IGroupService {
 			groupRepository.save(newGroup);
 
 			return "Create group name " + request.getGroupName() + " success.";
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public String addFriendsToGroup(String token, Set<Integer> userIds, String groupId) {
+	public String addFriendsToGroup(String token, Set<Integer> userIds, String groupId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User inviter = userRepository.findByEmail(email).orElseThrow(() -> new UserException("Not found user"));
@@ -169,13 +171,15 @@ public class GroupServiceImpl implements IGroupService {
 			}
 
 			return "Add friends to group " + group.getGroupName() + " success.";
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<FriendshipResponse> getListMembersForGroup(String token, String groupId) {
+	public List<FriendshipResponse> getListMembersForGroup(String token, String groupId) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User user = userRepository.findByEmail(email)
@@ -211,13 +215,15 @@ public class GroupServiceImpl implements IGroupService {
 	            }
 				return response;
 			}).collect(Collectors.toList());
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<GroupDTO> getListGroupsFromUser(String token) {
+	public List<GroupDTO> getListGroupsFromUser(String token) throws UserException {
 		try {
 			String email = jwtService.extractUsername(token);
 			User user = userRepository.findByEmail(email)
@@ -243,13 +249,15 @@ public class GroupServiceImpl implements IGroupService {
 						return dto;
 					})
 					.collect(Collectors.toList());
+		} catch (UserException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public String quitGroup(String token, String groupId) {
+	public String quitGroup(String token, String groupId) throws Exception {
 		try {
 			String email = jwtService.extractUsername(token);
 			User user = userRepository.findByEmail(email)
@@ -260,13 +268,15 @@ public class GroupServiceImpl implements IGroupService {
 					.orElseThrow(() -> new UserException("Not found user " + user.getEmail()));
 			groupMemberRepository.delete(member);
 			return "Quit out group " + group.getGroupName();
+		} catch (UserException | GroupException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
 	}
 
 	@Override
-	public List<UserDTO> getListUsersToAddGroup(String token, String groupId) {
+	public List<UserDTO> getListUsersToAddGroup(String token, String groupId) throws Exception {
 		try {
 			String email = jwtService.extractUsername(token);
 			User inviter = userRepository.findByEmail(email).orElseThrow(() -> new UserException("Not found user"));
@@ -287,6 +297,8 @@ public class GroupServiceImpl implements IGroupService {
 			return listFriends.stream()
 					.filter(friendUser -> !listMembers.contains(friendUser))
 					.map(friendUser -> mapper.map(friendUser, UserDTO.class)).collect(Collectors.toList());
+		} catch (UserException | GroupException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.toString());
 		}
