@@ -10,6 +10,7 @@ This is a personal project for a real-time chat application built with React.js 
 - User-friendly chat interface
 - Message history
 - List friends and groups
+- Create group, add/ remove members.
 
 ## Tech Stack
 
