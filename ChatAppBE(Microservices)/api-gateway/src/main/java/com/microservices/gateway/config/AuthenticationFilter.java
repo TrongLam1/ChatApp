@@ -1,9 +1,9 @@
-package com.microservice.gateway.config;
+package com.microservices.gateway.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservice.gateway.response.ResponseData;
-import com.microservice.gateway.service.IdentityService;
+import com.microservices.gateway.dto.response.ResponseData;
+import com.microservices.gateway.service.IdentityService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,9 +1,9 @@
-package com.microservice.gateway.service;
+package com.microservices.gateway.service;
 
-import com.microservice.gateway.repository.IdentityClient;
-import com.microservice.gateway.request.IntrospectRequest;
-import com.microservice.gateway.response.IntrospectResponse;
-import com.microservice.gateway.response.ResponseData;
+import com.microservices.gateway.dto.request.IntrospectRequest;
+import com.microservices.gateway.dto.response.IntrospectResponse;
+import com.microservices.gateway.dto.response.ResponseData;
+import com.microservices.gateway.repository.IdentityClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

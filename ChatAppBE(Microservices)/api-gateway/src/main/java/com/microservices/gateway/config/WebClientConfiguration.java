@@ -1,6 +1,6 @@
-package com.microservice.gateway.config;
+package com.microservices.gateway.config;
 
-import com.microservice.gateway.repository.IdentityClient;
+import com.microservices.gateway.repository.IdentityClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;

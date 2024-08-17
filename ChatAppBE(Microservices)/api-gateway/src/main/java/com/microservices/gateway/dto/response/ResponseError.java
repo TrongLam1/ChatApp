@@ -1,4 +1,4 @@
-package com.microservice.gateway.response;
+package com.microservices.gateway.dto.response;
 
 public class ResponseError<T> extends ResponseData<Object> {
 

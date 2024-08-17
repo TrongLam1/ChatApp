@@ -1,4 +1,4 @@
-package com.microservice.gateway.request;
+package com.microservices.gateway.dto.request;
 
 import lombok.Builder;
 import lombok.Data;
