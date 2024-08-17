@@ -1,4 +1,4 @@
-package com.microservices.account.config;
+package com.microservices.profile.config;
 
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.security.oauth2.jwt.Jwt;

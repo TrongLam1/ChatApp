@@ -1,13 +1,13 @@
-package com.chat.app.exception;
+package com.microservices.profile.exception;
 
-public class UserException extends Exception {
+public class ProfileException extends Exception {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	public UserException(String message) {
-		super(message);
-	}
+    public ProfileException(String message) {
+        super(message);
+    }
 }

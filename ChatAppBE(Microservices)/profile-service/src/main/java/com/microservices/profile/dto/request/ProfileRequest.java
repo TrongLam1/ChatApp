@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProfileCreationRequest {
+public class ProfileRequest {
 
     private Long userId;
 

@@ -1,1 +1,9 @@
-spring.application.name=profile-service
+server:
+  port: 8081
+
+spring:
+  application:
+    name: profile-service
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/profile-service
