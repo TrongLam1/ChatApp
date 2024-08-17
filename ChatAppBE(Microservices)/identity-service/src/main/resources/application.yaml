@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: "jdbc:mysql://localhost:3306/chat-identity"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+jwt:
+  signerKey: "G3NuAciE7eWh7SPOiEDvh30Lp7JXgCwRcPR4bQTlz3dY5i8DYPWhON37_aNwtv5o2ECJ_2g-Ii7unvcRzS9IEA"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds
+
+app:
+  services:
+    profile: http://localhost:8081/profile
