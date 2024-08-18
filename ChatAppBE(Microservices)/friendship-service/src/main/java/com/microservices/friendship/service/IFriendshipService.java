@@ -19,4 +19,6 @@ public interface IFriendshipService {
     List<FriendshipResponse> listUsersWaitingAccept();
 
     List<FriendshipResponse> listFriendsByUser();
+
+    boolean checkedStatusFriend(Long friendId);
 }

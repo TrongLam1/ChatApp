@@ -1,1 +1,22 @@
-spring.application.name=group-service
+server:
+  port: 8084
+
+spring:
+  application:
+    name: group-service
+  datasource:
+    url: "jdbc:mysql://localhost:3306/chat-group"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+app:
+  services:
+    profile: http://localhost:8081/profile
+    friendship: http://localhost:8082/friendship
+
+

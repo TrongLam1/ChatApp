@@ -69,4 +69,14 @@ public class FriendshipController {
             return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
+    @GetMapping("/checked-status-friend/{friendId}")
+    public ResponseData<?> checkedStatusFriend(@PathVariable Long friendId) {
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Check status friend",
+                    friendshipService.checkedStatusFriend(friendId));
+        } catch (Exception e) {
+            return new ResponseError<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+    }
 }

@@ -186,6 +186,17 @@ public class FriendshipServiceImpl implements IFriendshipService {
         }
     }
 
+    @Override
+    public boolean checkedStatusFriend(Long friendId) {
+        try {
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+            Friendship friendship = findFriendshipByUserId(userId, friendId);
+            return friendship.getStatus().equals(FriendshipStatus.FRIEND);
+        } catch (Exception e) {
+            throw new RuntimeException(e.toString());
+        }
+    }
+
     private Friendship findFriendshipByUserId(Long userId, Long userFriendId) throws FriendshipException {
         return friendshipRepository.findByUserIdAndUserFriendId(userId, userFriendId)
                 .orElseThrow(() -> new FriendshipException("Not found friendship"));
