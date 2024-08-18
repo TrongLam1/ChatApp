@@ -1,4 +1,4 @@
-package com.microservices.channel_service;
+package com.microservices.channel;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

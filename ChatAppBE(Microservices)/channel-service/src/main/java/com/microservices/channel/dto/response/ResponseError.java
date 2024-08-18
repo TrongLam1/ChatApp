@@ -1,4 +1,4 @@
-package com.microservices.account.dto.response;
+package com.microservices.channel.dto.response;
 
 public class ResponseError<T> extends ResponseData<Object> {
 

@@ -1,4 +1,4 @@
-package com.microservices.account.dto.response;
+package com.microservices.friendship.dto.response;
 
 public class ResponseError<T> extends ResponseData<Object> {
 

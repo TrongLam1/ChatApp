@@ -6,6 +6,7 @@ import com.microservices.gateway.dto.response.ResponseData;
 import com.microservices.gateway.service.IdentityService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private final IdentityService identityService;
@@ -55,12 +57,14 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         if (CollectionUtils.isEmpty(authHeaders)) return unauthenticated(exchange.getResponse());
 
         String token = authHeaders.get(0).replace("Bearer ", "");
+
         // Verify token
         return identityService.introspect(token).flatMap(introspectResponse -> {
             if (introspectResponse.getData().isValid()) {
                 return chain.filter(exchange);
             } else
-                return unauthenticated(exchange.getResponse());
+                log.info("False introspect");
+            return unauthenticated(exchange.getResponse());
         }).onErrorResume(throwable -> unauthenticated(exchange.getResponse()));
     }
 

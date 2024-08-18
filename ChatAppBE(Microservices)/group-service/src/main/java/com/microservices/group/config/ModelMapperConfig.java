@@ -1,4 +1,4 @@
-package com.microservices.account.config;
+package com.microservices.group.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

@@ -1,5 +1,7 @@
-package com.microservices.account.config;
+package com.microservices.channel.config;
 
+import com.microservices.account.config.CustomJwtDecoder;
+import com.microservices.account.config.JwtAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

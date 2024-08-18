@@ -27,6 +27,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
@@ -38,6 +39,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationServiceImpl implements IAuthenticationService {
@@ -68,6 +70,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public IntrospectResponse introspect(IntrospectRequest request) {
         var token = request.getToken();
         boolean isValid = true;
+        log.info(token);
 
         try {
             verifyToken(token, false);

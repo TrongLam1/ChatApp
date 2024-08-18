@@ -1,7 +1,7 @@
-package com.microservices.account.config;
+package com.microservices.channel.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservices.account.dto.response.ResponseData;
+import com.microservices.channel.dto.response.ResponseData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;

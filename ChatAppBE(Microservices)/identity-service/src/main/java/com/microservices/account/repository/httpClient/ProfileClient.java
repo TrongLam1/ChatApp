@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         configuration = {AuthenticationRequestInterceptor.class})
 public interface ProfileClient {
 
-    @PostMapping(value = "/internal", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/internal/new", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseData<ProfileResponse> createProfile(@RequestBody ProfileCreationRequest request);
+
 }

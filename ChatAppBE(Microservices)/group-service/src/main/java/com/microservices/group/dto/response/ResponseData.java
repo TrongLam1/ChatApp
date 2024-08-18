@@ -1,4 +1,4 @@
-package com.microservices.account.dto.response;
+package com.microservices.group.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
