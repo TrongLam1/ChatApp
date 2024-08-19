@@ -10,4 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class GroupResponse {
+
+    private Integer totalMembers;
+
+    private Long admin;
+
+    private String groupName;
 }

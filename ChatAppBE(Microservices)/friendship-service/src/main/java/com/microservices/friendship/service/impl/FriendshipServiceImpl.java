@@ -50,6 +50,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
             friendshipRepository.save(friendFriendship);
 
             return FriendshipResponse.builder()
+                    .userId(friendProfile.getUserId())
                     .userName(friendProfile.getUsername())
                     .avatar(null)
                     .status(myFriendship.getStatus().toString())
@@ -81,6 +82,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
             ProfileResponse friendProfile = profileClient.getProfileById(friendId).getData();
 
             return FriendshipResponse.builder()
+                    .userId(friendProfile.getUserId())
                     .userName(friendProfile.getUsername())
                     .avatar(null)
                     .status(myFriendship.getStatus().toString())
@@ -103,6 +105,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
             ProfileResponse friendProfile = profileClient.getProfileById(friendId).getData();
 
             return FriendshipResponse.builder()
+                    .userId(friendProfile.getUserId())
                     .userName(friendProfile.getUsername())
                     .avatar(null)
                     .status(null)
@@ -125,6 +128,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
                 for (Friendship friend : listFriends) {
                     if (friend.getUserFriendId().equals(profile.getUserId())) {
                         FriendshipResponse friendshipResponse = FriendshipResponse.builder()
+                                .userId(profile.getUserId())
                                 .avatar(null)
                                 .status(friend.getStatus().toString())
                                 .userName(profile.getUsername())
@@ -158,6 +162,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
                     .stream().map(friend -> {
                         ProfileResponse friendProfile = profileClient.getProfileById(friend.getUserId()).getData();
                         return FriendshipResponse.builder()
+                                .userId(friendProfile.getUserId())
                                 .avatar(null)
                                 .status(friend.getStatus().toString())
                                 .userName(friendProfile.getUsername())
@@ -176,6 +181,7 @@ public class FriendshipServiceImpl implements IFriendshipService {
                     .stream().map(friend -> {
                         ProfileResponse friendProfile = profileClient.getProfileById(friend.getUserId()).getData();
                         return FriendshipResponse.builder()
+                                .userId(friendProfile.getUserId())
                                 .avatar(null)
                                 .status(friend.getStatus().toString())
                                 .userName(friendProfile.getUsername())

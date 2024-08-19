@@ -12,17 +12,17 @@ public interface IGroupService {
 
     String createGroupChat(GroupCreationRequest request);
 
-    String addFriendsToGroup(Set<Integer> userIds, String groupId);
+    String addFriendsToGroup(Set<Long> userIds, Long groupId);
 
-    GroupResponse findGroupById(String groupId);
+    GroupResponse findGroupById(Long groupId);
 
-    List<ProfileResponse> getListUsersToAddGroup(String groupId);
+    List<ProfileResponse> getListUsersToAddGroup(Long groupId);
 
     List<GroupResponse> getListGroupsFromUser();
 
-    List<FriendshipResponse> getListMembersForGroup(String groupId);
+    List<FriendshipResponse> getListMembersForGroup(Long groupId);
 
-    String removeMemberFromGroup(String groupId, Integer memberId);
+    String removeMemberFromGroup(Long groupId, Long memberId);
 
-    String quitGroup(String groupId);
+    String quitGroup(Long groupId);
 }
