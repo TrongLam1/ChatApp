@@ -115,7 +115,7 @@ public class GroupServiceImpl implements IGroupService {
             List<FriendshipResponse> listFriendsUser = friendshipClient.getListFriendsFromUser().getData();
             Set<Long> listFriendsId = listFriendsUser.stream().map(FriendshipResponse::getUserId).collect(Collectors.toSet());
 
-            Set<Long> listFriendsIdToAdd = new HashSet<Long>();
+            Set<Long> listFriendsIdToAdd = new HashSet<>();
             for (Long friendId : listFriendsId) {
                 if (!membersIdGroup.contains(friendId)) listFriendsIdToAdd.add(friendId);
             }

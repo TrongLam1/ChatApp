@@ -3,23 +3,26 @@ package com.microservices.channel.service.impl;
 import com.microservices.channel.dto.request.MessageRequest;
 import com.microservices.channel.dto.response.MessageResponse;
 import com.microservices.channel.dto.response.ProfileResponse;
+import com.microservices.channel.dto.response.ResponseData;
 import com.microservices.channel.entity.Channel;
 import com.microservices.channel.entity.ChannelMessage;
 import com.microservices.channel.exception.ChannelException;
 import com.microservices.channel.repository.ChannelMessageRepository;
 import com.microservices.channel.repository.ChannelRepository;
 import com.microservices.channel.repository.httpClient.ProfileClient;
+import com.microservices.channel.repository.httpClient.SocketClient;
 import com.microservices.channel.service.IChannelMessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,6 +33,8 @@ public class ChannelMessageServiceImpl implements IChannelMessageService {
     private final ChannelMessageRepository channelMessageRepository;
 
     private final ProfileClient profileClient;
+
+    private final SocketClient socketClient;
 
     @Override
     public void sendMessage(MessageRequest request) {
@@ -47,14 +52,22 @@ public class ChannelMessageServiceImpl implements IChannelMessageService {
                     .build();
 
             channelMessageRepository.save(message);
+
+            ProfileResponse profile = profileClient.getProfileById(message.getSenderId()).getData();
+
+            ResponseData<String> mes = socketClient
+                    .sendMessage(MessageResponse.builder()
+                            .subscribeId(channel.getId())
+                            .sender(profile.getUsername())
+                            .content(message.getContent())
+                            .createdDate(message.getCreatedDate())
+                            .build());
+
+            log.info("Message: {}", mes.getMessage());
+
         } catch (Exception e) {
             throw new RuntimeException(e.toString());
         }
-    }
-
-    @Override
-    public String sendImage(MessageRequest message, MultipartFile file) {
-        return "";
     }
 
     @Override
@@ -71,7 +84,7 @@ public class ChannelMessageServiceImpl implements IChannelMessageService {
             } else {
                 friendProfile = profileClient.getProfileById(channel.getUserId()).getData();
             }
-            
+
             if (channel.getUserId().equals(userId) || channel.getFriendId().equals(userId)) {
                 return channelMessageRepository.getAllMessages(channel)
                         .stream().map(message -> {
@@ -91,7 +104,7 @@ public class ChannelMessageServiceImpl implements IChannelMessageService {
                             return messageResponse;
                         }).toList();
             } else {
-                return new ArrayList<MessageResponse>();
+                return new ArrayList<>();
             }
         } catch (Exception e) {
             throw new RuntimeException(e.toString());

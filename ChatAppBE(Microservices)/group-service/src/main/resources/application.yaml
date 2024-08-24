@@ -18,5 +18,6 @@ app:
   services:
     profile: http://localhost:8081/profile
     friendship: http://localhost:8082/friendship
+    socket: http://localhost:8085/socket
 
 

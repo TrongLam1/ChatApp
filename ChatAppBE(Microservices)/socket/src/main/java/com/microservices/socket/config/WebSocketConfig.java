@@ -1,4 +1,4 @@
-package com.microservices.channel.config;
+package com.microservices.socket.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

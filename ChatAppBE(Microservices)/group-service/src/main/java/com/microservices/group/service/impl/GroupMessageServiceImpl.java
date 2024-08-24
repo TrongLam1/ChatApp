@@ -10,12 +10,12 @@ import com.microservices.group.exception.GroupException;
 import com.microservices.group.repository.GroupMessageRepository;
 import com.microservices.group.repository.GroupRepository;
 import com.microservices.group.repository.httpClient.ProfileClient;
+import com.microservices.group.repository.httpClient.SocketClient;
 import com.microservices.group.service.IGroupMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,6 +35,8 @@ public class GroupMessageServiceImpl implements IGroupMessageService {
 
     private final ProfileClient profileClient;
 
+    private final SocketClient socketClient;
+
     @Override
     public void sendMessage(MessageRequest request) {
         try {
@@ -48,15 +50,24 @@ public class GroupMessageServiceImpl implements IGroupMessageService {
                     .group(group)
                     .build();
 
+            List<GroupMember> membersGroup = group.getGroupMembers();
+            Set<Long> membersIdGroup = membersGroup.stream().map(GroupMember::getUserId).collect(Collectors.toSet());
+
+            ProfileResponse profileSender = profileClient.getProfileById(userId).getData();
+
+            // Send notification for members in group except sender
+            membersIdGroup.stream().filter(memberId -> !memberId.equals(message.getSenderId()))
+                    .forEach(memberId -> socketClient.sendMessage(MessageResponse.builder()
+                            .subscribeId(group.getId())
+                            .createdDate(message.getCreatedDate())
+                            .sender(profileSender.getUsername())
+                            .content(message.getContent())
+                            .build()));
+
             groupMessageRepository.save(message);
         } catch (Exception e) {
             throw new RuntimeException(e.toString());
         }
-    }
-
-    @Override
-    public String sendImage(MessageRequest message, MultipartFile file) {
-        return "";
     }
 
     @Override

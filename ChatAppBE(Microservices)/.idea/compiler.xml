@@ -7,10 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
         <module name="group-service" />
         <module name="friendship-service" />
+        <module name="api-gateway" />
         <module name="profile-service" />
+        <module name="socket" />
         <module name="identity-service" />
         <module name="channel-service" />
       </profile>
@@ -24,6 +25,7 @@
       <module name="group-service" options="-parameters" />
       <module name="identity-service" options="-parameters" />
       <module name="profile-service" options="-parameters" />
+      <module name="socket" options="-parameters" />
     </option>
   </component>
 </project>

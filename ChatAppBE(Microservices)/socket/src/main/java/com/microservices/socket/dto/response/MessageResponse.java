@@ -1,4 +1,4 @@
-package com.microservices.channel.dto.response;
+package com.microservices.socket.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

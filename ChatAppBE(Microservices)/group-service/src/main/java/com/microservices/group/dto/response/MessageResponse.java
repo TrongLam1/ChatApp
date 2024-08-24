@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class MessageResponse {
 
+    private Long subscribeId;
+
     private String sender;
 
     private String content;

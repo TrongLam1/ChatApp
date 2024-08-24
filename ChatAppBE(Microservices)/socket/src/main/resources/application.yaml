@@ -1,0 +1,13 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: socket
+
+app:
+  services:
+    channel: http://localhost:8083/channel
+    group: http://localhost:8084/group
+
+
