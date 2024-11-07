@@ -6,7 +6,7 @@ const WebSocketContext = React.createContext({
     subscribe: '', receiver: '', messageReceiver: '', description: ''
 });
 
-const SOCKET_URL = 'http://localhost:8080/ws';
+const SOCKET_URL = 'http://localhost:8085/ws';
 
 const WebSocketProvider = ({ children }) => {
     const clientRef = useRef(null);

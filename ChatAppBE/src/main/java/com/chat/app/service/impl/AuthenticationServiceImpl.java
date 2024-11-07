@@ -1,13 +1,6 @@
 package com.chat.app.service.impl;
 
-import java.util.HashMap;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
+import com.chat.app.exception.UserException;
 import com.chat.app.model.Account;
 import com.chat.app.model.User;
 import com.chat.app.model.enums.Role;
@@ -17,129 +10,131 @@ import com.chat.app.request.AuthenRequest;
 import com.chat.app.request.SignUpRequest;
 import com.chat.app.response.JwtAuthenticationResponse;
 import com.chat.app.service.IAuthenticationService;
-
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements IAuthenticationService {
 
-	@Autowired
-	private AccountRepository accountRepo;
+    private final AccountRepository accountRepo;
 
-	@Autowired
-	private UserRepository userRepo;
+    private final UserRepository userRepo;
 
-	@Autowired
-	private JwtServiceImpl jwtService;
+    private final JwtServiceImpl jwtService;
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	private String generateCustomId() {
-		long count = accountRepo.count();
-		return count < 10 ? "account0" + count : "account" + count;
-	}
+    private final PasswordEncoder passwordEncoder;
 
-	@Override
-	public String signUp(SignUpRequest request) {
-		try {
-			boolean isCheckedEmail = accountRepo.findByEmail(request.getEmail()).isPresent();
+    private String generateCustomId() {
+        long count = accountRepo.count();
+        return count < 10 ? "account0" + count : "account" + count;
+    }
 
-			if (!isCheckedEmail) {
-				Account account = new Account();
-				account.setAccountId(generateCustomId());
-				account.setEmail(request.getEmail());
-				account.setPassword(passwordEncoder.encode(request.getPassword()));
+    @Override
+    public String signUp(SignUpRequest request) {
+        try {
+            boolean isCheckedEmail = accountRepo.findByEmail(request.getEmail()).isPresent();
 
-				User user = new User();
-				user.setEmail(request.getEmail());
-				user.setUserName(request.getUsername());
-				
-				userRepo.save(user);
+            if (!isCheckedEmail) {
+                Account account = new Account();
+                account.setAccountId(generateCustomId());
+                account.setEmail(request.getEmail());
+                account.setPassword(passwordEncoder.encode(request.getPassword()));
 
-				account.setUser(user);
-				account.setRole(Role.USER);
+                User user = new User();
+                user.setEmail(request.getEmail());
+                user.setUserName(request.getUsername());
 
-				accountRepo.save(account);
+                userRepo.save(user);
 
-				return "Successful account registration.";
-			} else {
-				throw new RuntimeException("Email has been used.");
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e.toString());
-		}
-	}
+                account.setUser(user);
+                account.setRole(Role.USER);
 
-	@Override
-	public JwtAuthenticationResponse signIn(AuthenRequest request) {
-		try {
-			authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                accountRepo.save(account);
 
-			Account account = accountRepo.findByEmail(request.getEmail())
-					.orElseThrow(() -> new RuntimeException("Not found account."));
+                return "Successful account registration.";
+            } else {
+                throw new UserException("Email has been used.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.toString());
+        }
+    }
 
-			var jwtToken = jwtService.generateToken(account);
-			var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), account);
+    @Override
+    public JwtAuthenticationResponse signIn(AuthenRequest request) {
+        try {
+            authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-			JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-			jwtResponse.setToken(jwtToken);
-			jwtResponse.setRefreshToken(refreshToken);
-			jwtResponse.setName(account.getUser().getUserName());
-			jwtResponse.setExpiredTime(jwtService.isTokenExpiredTime(jwtToken));
-			jwtResponse.setRole(account.getRole());
-			jwtResponse.setAvatar(account.getUser().getImage_url());
-			jwtResponse.setUserId(account.getUser().getUserId());
-			account.setRefreshToken(refreshToken);
+            Account account = accountRepo.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Not found account."));
 
-			accountRepo.save(account);
+            var jwtToken = jwtService.generateToken(account);
+            var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), account);
 
-			return jwtResponse;
-		} catch (Exception e) {
-			throw new RuntimeException("Error: " + e.toString());
-		}
-	}
+            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+            jwtResponse.setToken(jwtToken);
+            jwtResponse.setRefreshToken(refreshToken);
+            jwtResponse.setName(account.getUser().getUserName());
+            jwtResponse.setExpiredTime(jwtService.isTokenExpiredTime(jwtToken));
+            jwtResponse.setRole(account.getRole());
+            jwtResponse.setAvatar(account.getUser().getImage_url());
+            jwtResponse.setUserId(account.getUser().getUserId());
+            account.setRefreshToken(refreshToken);
 
-	@Override
-	public JwtAuthenticationResponse refreshToken(String token) {
-		try {
-			Account account = accountRepo.findByRefreshToken(token)
-					.orElseThrow(() -> new RuntimeException("Invalid refresh token."));
+            accountRepo.save(account);
 
-			var jwtToken = jwtService.generateToken(account);
-			var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), account);
+            return jwtResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("Error: " + e.toString());
+        }
+    }
 
-			JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
-			jwtResponse.setToken(jwtToken);
-			jwtResponse.setRefreshToken(refreshToken);
-			jwtResponse.setName(account.getEmail());
-			jwtResponse.setExpiredTime(jwtService.isTokenExpiredTime(jwtToken));
-			account.setRefreshToken(refreshToken);
+    @Override
+    public JwtAuthenticationResponse refreshToken(String token) {
+        try {
+            Account account = accountRepo.findByRefreshToken(token)
+                    .orElseThrow(() -> new RuntimeException("Invalid refresh token."));
 
-			accountRepo.save(account);
+            var jwtToken = jwtService.generateToken(account);
+            var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), account);
 
-			return jwtResponse;
-		} catch (Exception e) {
-			throw new RuntimeException("Error: " + e.toString());
-		}
-	}
+            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse();
+            jwtResponse.setToken(jwtToken);
+            jwtResponse.setRefreshToken(refreshToken);
+            jwtResponse.setName(account.getEmail());
+            jwtResponse.setExpiredTime(jwtService.isTokenExpiredTime(jwtToken));
+            account.setRefreshToken(refreshToken);
 
-	@Override
-	public String logOut(String token) {
-		try {
-			String email = jwtService.extractUsername(token);
-			Account account = accountRepo.findByEmail(email)
-					.orElseThrow(() -> new RuntimeException("User information does not exist."));
-			account.setRefreshToken(null);
+            accountRepo.save(account);
 
-			return "Log out success.";
-		} catch (Exception e) {
-			throw new RuntimeException(e.toString());
-		}
-	}
+            return jwtResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("Error: " + e.toString());
+        }
+    }
+
+    @Override
+    public String logOut(String token) {
+        try {
+            String email = jwtService.extractUsername(token);
+            Account account = accountRepo.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User information does not exist."));
+            account.setRefreshToken(null);
+
+            return "Log out success.";
+        } catch (Exception e) {
+            throw new RuntimeException(e.toString());
+        }
+    }
 }
