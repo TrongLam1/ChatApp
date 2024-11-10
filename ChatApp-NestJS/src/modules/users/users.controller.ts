@@ -1,34 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Public } from 'src/decorator/decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Public()
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.register(createUserDto);
+  }
+
+  @Put('update-profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    return await this.usersService.updateUser(req, updateUserDto);
+  }
+
+  @Put('change-avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async changeAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    return await this.usersService.changeAvatar(req, file);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Req() req) {
+    return await this.usersService.getProfile(req);
   }
 }
