@@ -1,34 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ChannelMessagesService } from './channel-messages.service';
-import { CreateChannelMessageDto } from './dto/create-channel-message.dto';
-import { UpdateChannelMessageDto } from './dto/update-channel-message.dto';
+import { ChannelMessageDto } from './dto/channel-message.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('channel-messages')
 export class ChannelMessagesController {
-  constructor(private readonly channelMessagesService: ChannelMessagesService) {}
+  constructor(private readonly channelMessagesService: ChannelMessagesService) { }
 
-  @Post()
-  create(@Body() createChannelMessageDto: CreateChannelMessageDto) {
-    return this.channelMessagesService.create(createChannelMessageDto);
+  @Post('post-message')
+  @UseGuards(JwtAuthGuard)
+  async postMessage(@Req() req, @Body() channelMessageDto: ChannelMessageDto) {
+    return await this.channelMessagesService.postMessage(req, channelMessageDto);
   }
 
-  @Get()
-  findAll() {
-    return this.channelMessagesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.channelMessagesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChannelMessageDto: UpdateChannelMessageDto) {
-    return this.channelMessagesService.update(+id, updateChannelMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.channelMessagesService.remove(+id);
+  @Post('post-message')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async postImage(
+    @Req() req,
+    @Body() channelMessageDto: ChannelMessageDto,
+    @UploadedFile() file: Express.Multer.File) {
+    return await this.channelMessagesService.postImage(req, channelMessageDto, file);
   }
 }

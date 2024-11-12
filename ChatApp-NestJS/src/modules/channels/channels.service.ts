@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Channel } from 'diagnostics_channel';
+import { Model } from 'mongoose';
+import { FriendshipService } from '../friendship/friendship.service';
 
 @Injectable()
 export class ChannelsService {
-  create(createChannelDto: CreateChannelDto) {
-    return 'This action adds a new channel';
+  constructor(
+    @InjectModel(Channel.name)
+    private readonly channelModel: Model<Channel>,
+    private readonly friendshipService: FriendshipService
+  ) { }
+
+  async createNewChannel(req, friendId: string) {
+    const isFriend = await this.friendshipService.isFriend(req, friendId);
+    if (!isFriend) throw new BadRequestException("Chưa kết bạn, không thể nhắn tin.");
+
+    const channel = await this.channelModel.create(
+      { userId: req.user.userId, friendId: friendId });
+
+    return channel;
   }
 
-  findAll() {
-    return `This action returns all channels`;
-  }
+  async findChannel(req, friendId: string) {
+    if (req.user.userId === friendId) throw new BadRequestException("Người nhận không hợp lệ.");
 
-  findOne(id: number) {
-    return `This action returns a #${id} channel`;
-  }
+    let channel = await this.channelModel.findOne({
+      userId: req.user.userId, friendId
+    });
 
-  update(id: number, updateChannelDto: UpdateChannelDto) {
-    return `This action updates a #${id} channel`;
-  }
+    if (!channel) {
+      channel = await this.channelModel.findOne({
+        friendId, userId: req.user.userId
+      });
 
-  remove(id: number) {
-    return `This action removes a #${id} channel`;
+      if (!channel) {
+        return await this.createNewChannel(req, friendId);
+      }
+    }
+
+    return channel;
   }
 }
