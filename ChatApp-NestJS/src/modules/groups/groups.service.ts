@@ -1,26 +1,92 @@
-import { Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import { BadRequestException, Body, Injectable, NotFoundException } from '@nestjs/common';
+import { Group } from './schemas/group.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { FriendshipService } from '../friendship/friendship.service';
+import { GroupDto } from './dto/group.dto';
+import { UsersService } from '../users/users.service';
+import { GroupMembersService } from '../group-members/group-members.service';
 
 @Injectable()
 export class GroupsService {
-  create(createGroupDto: CreateGroupDto) {
-    return 'This action adds a new group';
+  constructor(
+    @InjectModel(Group.name)
+    private readonly groupModel: Model<Group>,
+    private readonly friendshipService: FriendshipService,
+    private readonly userService: UsersService,
+    private readonly groupMemberService: GroupMembersService,
+  ) { }
+
+  async createGroup(req, @Body() groupDto: GroupDto) {
+    const { groupName, memberIds } = groupDto;
+    const admin = await this.userService.findOneById(req.user.userId);
+
+    const group = await this.groupModel.create({
+      groupName: groupName, admin: admin._id
+    });
+
+    await this.groupMemberService.createGroupMember(admin, group);
+
+    memberIds.map(async (memberId) => {
+      const member = await this.userService.findOneById(memberId);
+      await this.groupMemberService.createGroupMember(member, group);
+    });
+
+    return group;
   }
 
-  findAll() {
-    return `This action returns all groups`;
+  async findGroupById(groupId: string) {
+    const group = await this.groupModel.findOne({
+      _id: groupId, isAvailable: true
+    });
+    if (!group) throw new NotFoundException("Không tìm thấy nhóm.");
+    return group;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  async addMember(req, groupId: string, memberId: string) {
+    const user: any = await this.userService.findOneById(req.user.userId);
+    const group = await this.findGroupById(groupId);
+    const member: any = await this.userService.findOneById(memberId);
+    await this.groupMemberService.addMember(user._id, member._id, group);
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async getListMembersGroup(req, groupId: string) {
+    const user: any = await this.userService.findOneById(req.user.userId);
+    const group = await this.findGroupById(groupId);
+
+    return await this.groupMemberService.getListMembersGroup(user._id, group);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} group`;
+  async getListGroupsByUser(req) {
+    const user: any = await this.userService.findOneById(req.user.userId);
+    return await this.groupMemberService.getListGroupsByUser(user._id);
+  }
+
+  async removeMember(req, groupId: string, memberId: string) {
+    const user: any = await this.userService.findOneById(req.user.userId);
+    const group: any = await this.findGroupById(groupId);
+    if (group.admin.toString() !== user._id.toString())
+      throw new BadRequestException("Bạn không có quyền xóa thành viên khỏi nhóm.");
+
+    const member: any = await this.userService.findOneById(memberId);
+
+    return await this.groupMemberService.removeMember(group, member);
+  }
+
+  async quitGroup(req, groupId: string) {
+    const user: any = await this.userService.findOneById(req.user.userId);
+    const group: any = await this.findGroupById(groupId);
+
+    if (group.admin.toString() === user._id.toString()) {
+      await this.groupModel.findByIdAndUpdate(
+        { _id: group._id },
+        { isAvailable: false },
+        { new: true }
+      );
+      return "Đã giải tán nhóm.";
+    } else {
+      await this.groupMemberService.removeMember(group._id, user._id);
+      return "Đã thoát khỏi nhóm.";
+    }
   }
 }

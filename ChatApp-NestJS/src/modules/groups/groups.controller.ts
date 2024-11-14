@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { GroupsService } from './groups.service';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import { GroupDto } from './dto/group.dto';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
 @Controller('groups')
 export class GroupsController {
-  constructor(private readonly groupsService: GroupsService) {}
+  constructor(private readonly groupsService: GroupsService) { }
 
-  @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.create(createGroupDto);
+  @Post('create')
+  @UseGuards(JwtAuthGuard)
+  async createGroup(@Req() req, @Body() groupDto: GroupDto) {
+    return await this.groupsService.createGroup(req, groupDto);
   }
 
-  @Get()
-  findAll() {
-    return this.groupsService.findAll();
+  @Post('add-member')
+  @UseGuards(JwtAuthGuard)
+  async addMember(
+    @Req() req,
+    @Query('groupId') groupId: string,
+    @Query('memberId') memberId: string,
+  ) {
+    return await this.groupsService.addMember(req, groupId, memberId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.groupsService.findOne(+id);
+  @Get('members/:groupId')
+  @UseGuards(JwtAuthGuard)
+  async getListMembersGroup(@Req() req, @Param('groupId') groupId: string) {
+    return await this.groupsService.getListMembersGroup(req, groupId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    return this.groupsService.update(+id, updateGroupDto);
+  @Get('list-groups-by-user')
+  @UseGuards(JwtAuthGuard)
+  async getListGroupsByUser(@Req() req) {
+    return await this.groupsService.getListGroupsByUser(req);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.groupsService.remove(+id);
+  @Delete('remove-member')
+  @UseGuards(JwtAuthGuard)
+  async removeMember(
+    @Req() req,
+    @Query('groupId') groupId: string,
+    @Query('memberId') memberId: string,
+  ) {
+    return await this.groupsService.removeMember(req, groupId, memberId);
+  }
+
+  @Delete('quit/:groupId')
+  @UseGuards(JwtAuthGuard)
+  async quitGroup(@Req() req, @Param('groupId') groupId: string) {
+    return await this.groupsService.quitGroup(req, groupId);
   }
 }

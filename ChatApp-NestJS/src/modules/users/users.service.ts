@@ -66,7 +66,17 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
-    return await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email });
+    if (!user) throw new NotFoundException("Không tìm thấy thông tin người dùng.");
+
+    return user;
+  }
+
+  async findOneById(_id: string) {
+    const user = await this.userModel.findOne({ _id });
+    if (!user) throw new NotFoundException("Không tìm thấy thông tin người dùng.");
+
+    return user;
   }
 
   async getProfile(req: any) {
@@ -82,26 +92,6 @@ export class UsersService {
       { new: true }
     );
     return user.refreshToken;
-  }
-
-  async findUsersByNameContains(current: number, pageSize: number, sort: string, name: string) {
-    if (!current || current == 0) current = 1;
-    if (!pageSize || current == 0) pageSize = 10;
-
-    const sortOrder: 'ASC' | 'DESC' = sort === 'DESC' ? 'DESC' : 'ASC';
-
-    const totalItems = (await this.userModel.find({ name })).length;
-    const totalPages = Math.ceil(totalItems / pageSize);
-    const skip = (current - 1) * pageSize;
-
-    const result = await this.userModel
-      .find({ name })
-      .limit(pageSize)
-      .skip(skip)
-      .select('-password')
-      .sort(sortOrder);
-
-    return { result, totalItems, totalPages };
   }
 
   async updateUser(req: any, @Body() updateUserDTO: UpdateUserDto) {

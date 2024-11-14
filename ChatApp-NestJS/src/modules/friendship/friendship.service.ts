@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
-import { Friendship, StatusFriendship } from './schemas/friendship.schema';
+import { Model } from 'mongoose';
 import { UsersService } from '../users/users.service';
+import { Friendship, StatusFriendship } from './schemas/friendship.schema';
 
 @Injectable()
 export class FriendshipService {
@@ -95,6 +95,20 @@ export class FriendshipService {
       );
 
     return "Hủy kết bạn thành công.";
+  }
+
+  async isFriend(req, friendId: string) {
+    const user = await this.userService.findOneById(req.user.userId);
+    const friend = await this.userService.findOneById(friendId);
+
+    const friendship = await this.friendshipModel.findOne({
+      userId: user._id,
+      friendId: friend._id
+    });
+
+    if (friendship.status === StatusFriendship.FRIEND) return true;
+
+    return false;
   }
 
   async getListFriends(req) {

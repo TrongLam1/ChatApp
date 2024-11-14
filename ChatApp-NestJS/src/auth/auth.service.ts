@@ -1,26 +1,51 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { JwtService } from '@nestjs/jwt';
+import { comparePasswordHelper } from 'src/helpers/utils';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService
+  ) { }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) return null;
+
+    const validPassword = await comparePasswordHelper(password, user.password);
+    if (!validPassword) return null;
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  // async validateGoogleUser(googleUser: CreateUserDto) {
+  //   const user = await this.userService.findOneByEmail(googleUser.email);
+  //   if (user) return user;
+  //   return await this.userService.register(googleUser);
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  async signIn(user): Promise<any> {
+    const payload = {
+      id: user._id.toString(), email: user.email, phone: user.phone, username: user.name
+    };
+    const refreshToken = this.jwtService.sign(payload,
+      {
+        secret: process.env.REFRESH_JWT_SECRET_KEY,
+        expiresIn: '30d'
+      })
+    await this.userService.saveRefreshToken(user, refreshToken);
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    return {
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        username: user.name,
+        phone: user.phone,
+      },
+      access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
+      refreshToken
+    };
   }
 }
