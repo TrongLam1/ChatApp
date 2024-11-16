@@ -1,0 +1,105 @@
+.list-friends-container {
+    flex: 1;
+    overflow-y: auto;
+
+    .search {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+
+        .search-bar {
+            flex: 1;
+            background-color: rgba(17, 25, 40, .5);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 5px;
+            border-radius: 10px;
+
+            svg {
+                font-size: 1rem;
+                color: white;
+                padding-left: 5px;
+            }
+
+            input {
+                background-color: transparent;
+                border: none;
+                outline: none;
+                color: white;
+                flex: 1;
+                font-size: .8rem;
+            }
+        }
+
+        .add,
+        .new-group {
+            font-size: 1.1rem;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            cursor: pointer;
+            background-color: rgba(17, 25, 40, .5);
+            border-radius: 10px;
+            border-style: none;
+
+            &:active {
+                border-style: none;
+            }
+
+            svg {
+                color: white;
+            }
+        }
+    }
+
+    .tab {
+        color: white;
+        padding: 0 20px 10px;
+        display: flex;
+        font-size: .8rem;
+        justify-content: space-between;
+        border-bottom: 1px solid #1a73e8;
+
+        button {
+            border-radius: 10px;
+            outline: none;
+            border: none;
+            padding: 4px 15px;
+            font-weight: bold;
+
+            &.active {
+                background-color: #1a73e8;
+                color: white;
+            }
+
+            &:hover {
+                background-color: #1a73e8;
+                color: white;
+            }
+        }
+
+        .amount-add-friend {
+            position: relative;
+
+            .amount {
+                position: absolute;
+                top: -10px;
+                right: -6px;
+                font-size: .85rem;
+                background-color: red;
+                padding: 1px 3px;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    .list-chats {
+
+        .no-content {
+            color: white;
+            padding: 20px;
+        }
+    }
+}

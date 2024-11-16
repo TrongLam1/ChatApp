@@ -1,0 +1,52 @@
+.user-info-container {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    svg {
+        color: white;
+    }
+
+    .user {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        color: white;
+
+        h5 {
+            margin-right: 10px;
+            margin-bottom: 0;
+        }
+
+        img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    }
+
+    .icons {
+        display: flex;
+        gap: 10px;
+        color: white;
+        align-items: center;
+
+        .dropdown {
+            button {
+                background-color: transparent;
+                border: none;
+                padding: 6px 0;
+            }
+
+            .dropdown-menu {
+                max-width: 100px;
+            }
+        }
+
+        img {
+            width: 20px;
+        }
+    }
+}
