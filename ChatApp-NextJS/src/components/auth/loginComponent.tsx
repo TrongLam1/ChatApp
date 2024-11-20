@@ -1,11 +1,15 @@
 'use client'
 
 import logo from '@/assets/images/logo.png';
+import authenticate from '@/utils/actions';
+import Image from 'next/image';
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 export default function LoginComponent() {
+    const router = useRouter();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,19 +36,13 @@ export default function LoginComponent() {
 
         setLoadingApi(true);
 
-        // let res = await signIn(email, password);
-        // if (res && res.status === 200) {
-        //     loginContext(res.data.name, res.data.token, res.data.avatar);
-        //     setChannelNotify(res.data.userId);
-        //     localStorage.setItem('refreshToken', res.data.refreshToken);
-        //     navigate("/");
-        // } else {
-        //     if (res && res.status === 400) {
-        //         let index = res.message.lastIndexOf(":");
-        //         let errorMessage = res.message.substring(+index + 1);
-        //         toast.error(errorMessage);
-        //     }
-        // }
+        const res = await authenticate(email, password);
+
+        if (res.err) {
+            toast.error(res.error);
+        } else {
+            router.push("/");
+        }
 
         setLoadingApi(false);
     }
@@ -58,7 +56,7 @@ export default function LoginComponent() {
                             <div className="card-body p-3 p-md-4 p-xl-5">
                                 <div className="text-center mb-3">
                                     <div>
-                                        <img src={logo} alt="Logo" width="80" height="80" />
+                                        <Image src={logo} alt="Logo" width="80" height="80" />
                                     </div>
                                 </div>
                                 <h2 className="fs-2 fw-bold text-center text-secondary mb-4">

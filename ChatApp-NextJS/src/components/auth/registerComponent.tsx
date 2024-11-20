@@ -1,18 +1,20 @@
 'use client'
 
+import { Register } from '@/app/api/userApi';
 import logo from '@/assets/images/logo.png';
+import Image from 'next/image';
 import Link from "next/link";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { toast } from 'react-toastify';
 
 export default function RegisterComponent() {
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [username, setUsername] = useState('');
-    const [loadingApi, setLoadingApi] = useState(false);
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
+    const [loadingApi, setLoadingApi] = useState<boolean>(false);
 
-    const handleSignUp = async (e) => {
+    const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!email || !password || !username) {
@@ -27,17 +29,12 @@ export default function RegisterComponent() {
 
         setLoadingApi(true);
 
-        // let res = await signUp(username, email, password);
-        // if (res && res.status === 201) {
-        //     toast.success("Successful account registration.")
-        //     navigate("/login");
-        // } else {
-        //     if (res && res.status === 400) {
-        //         let index = res.message.lastIndexOf(":");
-        //         let errorMessage = res.message.substring(+index + 1);
-        //         toast.error(errorMessage);
-        //     }
-        // }
+        const res = await Register(username, email, password);
+
+        if (res.statusCode !== 201) {
+            toast.error(res.message);
+            return;
+        }
 
         setLoadingApi(false);
     };
@@ -57,7 +54,7 @@ export default function RegisterComponent() {
                             <div className="card-body p-3 p-md-4 p-xl-5">
                                 <div className="text-center mb-3">
                                     <div>
-                                        <img src={logo} alt="Logo" width="80" height="80" />
+                                        <Image src={logo} alt="Logo" width="80" height="80" />
                                     </div>
                                 </div>
                                 <h2 className="fs-2 fw-bold text-center text-secondary mb-4">

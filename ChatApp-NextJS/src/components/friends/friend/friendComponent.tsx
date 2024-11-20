@@ -1,17 +1,27 @@
 'use client'
 
-import { useState } from "react";
 import avatar from '../../../assets/images/avatar.png';
 import './friendComponent.scss';
+import Image from "next/image";
+import { FindChannel } from "@/app/api/channelApi";
+import { useTab } from '@/providers/tabProvider';
+import { useContactObject } from '@/providers/contactObjectProvider';
+import { toast } from 'react-toastify';
 
 export default function FriendComponent(props: any) {
 
-    const { item, tab } = props;
+    const { friend, token } = props;
 
-    const [friend, setFriend] = useState(item);
+    const { tab } = useTab();
+    const { setContactObject } = useContactObject();
 
-    const handleSubscribeChannel = async (userId: string) => {
-
+    const handleSubscribeChannel = async (friendId: string) => {
+        const res = await FindChannel(token, friendId);
+        if (res.statusCode === 200) {
+            setContactObject(res.data.friend);
+        } else {
+            toast.error(res.message);
+        }
     };
 
     const handleSubscribeGroup = async (groupId: string) => {
@@ -19,8 +29,8 @@ export default function FriendComponent(props: any) {
     };
 
     const formatTime = () => {
-        if (item?.lastMessage?.createAt !== undefined) {
-            const dateString = item?.lastMessage?.createAt;
+        if (friend?.lastMessage?.createAt !== undefined) {
+            const dateString = friend?.lastMessage?.createAt;
 
             const date = new Date(dateString);
 
@@ -36,20 +46,20 @@ export default function FriendComponent(props: any) {
 
     return (
         <div className='friend'
-            onClick={() => { tab === 'friends' ? handleSubscribeChannel(item?.id) : handleSubscribeGroup(item?.groupId) }}>
-            <img src={item?.avatar || item?.image_url ? item?.avatar || item?.image_url : avatar} alt='' />
+            onClick={() => { tab === 'friends' ? handleSubscribeChannel(friend.userId._id) : handleSubscribeGroup(friend?.groupId) }}>
+            <Image src={friend?.avatar || friend?.image_url ? friend?.avatar || friend?.imageUrl : avatar} alt='' />
             <div className='texts'>
                 <div className='info'>
                     <div className='title-info'>
-                        <span>{item.userName || item.groupName}</span>
+                        <span>{friend.userId.name || friend.groupName}</span>
                         <p>{formatTime()}</p>
                     </div>
-                    {item.lastMessage &&
+                    {/* {friend.lastMessage &&
                         <div className='last-message'>
-                            <p>{item.lastMessage.sender}:</p>
-                            <p>{item.lastMessage.content}</p>
+                            <p>{friend.lastMessage.sender}:</p>
+                            <p>{friend.lastMessage.content}</p>
                         </div>
-                    }
+                    } */}
                 </div>
             </div>
         </div>

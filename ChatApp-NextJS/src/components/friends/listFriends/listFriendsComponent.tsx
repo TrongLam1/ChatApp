@@ -3,24 +3,36 @@
 import { useState } from "react";
 import './listFriendsComponent.scss';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faMinus, faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import UserInfoComponent from "@/components/userInfo/userInfoComponent";
+import { useTab } from "@/providers/tabProvider";
+import FriendComponent from "../friend/friendComponent";
+import AddFriendModal from "@/components/modal/addFriend/addFriendModal";
+import { useRouter } from "next/navigation";
 
 export default function ListFriendsComponent(props: any) {
+    const router = useRouter();
+
+    const { user, token, listContacts } = props;
+
+    const { tab, setTab } = useTab();
 
     const [username, setUsername] = useState('');
     const [openModalUserInfo, setOpenModalUserInfo] = useState(false);
     const [openModalCreateGroup, setOpenModalCreateGroup] = useState(false);
-    const [listChats, setListChats] = useState([]);
-    const [tab, setTab] = useState('');
+    const [chatWith, setChatWith] = useState();
     const [amountAddFriend, setAmountAddFriend] = useState(0);
 
     const handleFindFriendByUsername = async () => { }
 
+    const handleNavigateTab = (tab: string) => {
+        setTab(tab);
+        router.push(`?tab=${tab}`);
+    };
+
     return (
         <div className='list-friends-container'>
-            {/* user={user} */}
-            <UserInfoComponent />
+            <UserInfoComponent user={user} />
             <div className='search'>
                 <div className='search-bar'>
                     <FontAwesomeIcon icon={faMagnifyingGlass} onClick={handleFindFriendByUsername} />
@@ -31,7 +43,10 @@ export default function ListFriendsComponent(props: any) {
                     />
                 </div>
                 {tab !== 'groups' ?
-                    (<button type='button' className='add' onClick={() => setOpenModalUserInfo((prev) => !prev)}>
+                    (<button type='button' className='add'
+                        onClick={() =>
+                            setOpenModalUserInfo((prev) => !prev)
+                        }>
                         {openModalUserInfo === false ?
                             <FontAwesomeIcon icon={faPlus} /> :
                             <FontAwesomeIcon icon={faMinus} />}
@@ -39,27 +54,33 @@ export default function ListFriendsComponent(props: any) {
                     :
                     (<button type='button' className='new-group'
                         onClick={() => setOpenModalCreateGroup(!openModalCreateGroup)}>
-                        <i className="fa-solid fa-user-group"></i>
+                        <FontAwesomeIcon icon={faUserGroup} />
                     </button>)
                 }
             </div>
             <div className='tab'>
                 <div>
                     <button className={`${tab === 'friends' ? 'active' : ''}`}
-                        onClick={() => setTab('friends')}>Friends</button>
+                        onClick={() => handleNavigateTab('friends')}>Friends</button>
                 </div>
                 <div>
                     <button className={`${tab === 'groups' ? 'active' : ''}`}
-                        onClick={() => setTab('groups')}>Groups</button>
+                        onClick={() => handleNavigateTab('groups')}>Groups</button>
                 </div>
                 <div className='amount-add-friend'>
                     <button className={`${tab === 'accepts' ? 'active' : ''}`}
-                        onClick={() => setTab('accepts')}>Accepts</button>
+                        onClick={() => handleNavigateTab('accepts')}>Accepts</button>
                     <div className='amount'>{amountAddFriend}</div>
                 </div>
             </div>
-            {/* <div className='list-chats'>
-                {listChats && listChats.length > 0 ?
+            <div className='list-chats'>
+                {listContacts && listContacts.length > 0 &&
+                    listContacts.map((item: any, index: number) => {
+                        return (<FriendComponent friend={item} key={`friend-${index}`}
+                            setChatWith={setChatWith} token={token}
+                        />)
+                    })}
+                {/* {listChats && listChats.length > 0 ?
                     listChats.map((item, index) => {
                         return tab === 'accepts' ?
                             (<WaitingAcceptFriend item={item} key={`friend-${index}`}
@@ -72,10 +93,10 @@ export default function ListFriendsComponent(props: any) {
                                 handleShowContentForTab={handleShowContentForTab}
                             />)
                     }) : <div className='no-content'>No content</div>
-                }
-            </div> */}
-            {/* {openModalUserInfo && <AddUser />}
-            {openModalCreateGroup && <CreateGroup open={openModalCreateGroup}
+                } */}
+            </div>
+            {openModalUserInfo && <AddFriendModal token={token} />}
+            {/* {openModalCreateGroup && <CreateGroup open={openModalCreateGroup}
                 setOpen={setOpenModalCreateGroup} />} */}
         </div>
     );

@@ -1,23 +1,39 @@
 'use client'
 
 import { useState } from 'react';
+import avatar from '@/assets/images/avatar.png';
+import group from '@/assets/images/group.png';
 import './detailComponent.scss';
+import { useContactObject } from '@/providers/contactObjectProvider';
+import { useTab } from '@/providers/tabProvider';
+import Image from 'next/image';
 
 export default function DetailComponent(props: any) {
+
+    const { tab } = useTab();
+    const { contactObject } = useContactObject();
 
     const [openModal, setOpenModal] = useState(false);
     const [userDetail, setUserDetail] = useState('');
     const [isShowMembers, setIsShowMembers] = useState(false);
     const [membersOfGroup, setMembersOfGroup] = useState([]);
 
+    const handleSetAvatar = () => {
+        if (contactObject.isGroup) {
+            return group;
+        } else {
+            return contactObject.avatar ?? avatar;
+        }
+    };
+
     return (
         <>
-            {/* <div className='detail-container'>
-                {chatWith &&
+            <div className='detail-container'>
+                {contactObject &&
                     <>
                         <div className='user'>
-                            <img src={handleSetAvatar()} alt='avatar' />
-                            <h3>{tab === 'friends' ? userDetail?.userName : userDetail?.groupName}</h3>
+                            <Image src={handleSetAvatar()} alt='avatar' />
+                            <h3>{contactObject.name}</h3>
                         </div>
                         <div className='info'>
                             <div className='option'>
@@ -30,7 +46,7 @@ export default function DetailComponent(props: any) {
                                     <span>Privacy & help</span>
                                 </div>
                             </div>
-                            {tab === 'groups' &&
+                            {/* {tab === 'groups' &&
                                 <div className='option'>
                                     <div className='title'>
                                         <div className='members-container'>
@@ -55,14 +71,14 @@ export default function DetailComponent(props: any) {
                                         </div>
                                     }
                                 </div>
-                            }
-                            {tab === 'groups' &&
+                            } */}
+                            {/* {tab === 'groups' &&
                                 <button type='button' onClick={handleQuitOutGroup}>Quit</button>
-                            }
+                            } */}
                         </div>
                     </>
                 }
-            </div> */}
+            </div>
             {/* <InviteUsers open={openModal} setOpen={setOpenModal} groupId={chatWith} /> */}
         </>
     );
