@@ -20,7 +20,7 @@ export class GroupMembersService {
         return false;
     }
 
-    private async checkedUserInGroup(memberId: string, group: any) {
+    async checkedUserInGroup(memberId: string, group: any) {
         const isExisted = await this.groupMemberModel.exists({
             user: memberId, group: group._id
         });

@@ -34,7 +34,7 @@ export class FriendshipService {
       status: StatusFriendship.WAITING
     });
 
-    const friendshipFriend = await this.friendshipModel.create({
+    await this.friendshipModel.create({
       friendId: user._id.toString(),
       userId: friend._id.toString(),
       status: StatusFriendship.PENDING
@@ -60,7 +60,7 @@ export class FriendshipService {
 
     if (!friendshipMe) throw new BadRequestException("Bạn không thể đồng ý kết bạn.");
 
-    const friendshipFriend = await this.friendshipModel
+    await this.friendshipModel
       .findOneAndUpdate(
         {
           friendId: user._id,
@@ -78,7 +78,7 @@ export class FriendshipService {
     const user = await this.userService.findOneById(req.user.userId);
     const friend = await this.userService.findOneById(_userId);
 
-    const friendshipMe = await this.friendshipModel
+    await this.friendshipModel
       .findOneAndDelete(
         {
           userId: user._id,
@@ -86,7 +86,7 @@ export class FriendshipService {
         }
       );
 
-    const friendshipFriend = await this.friendshipModel
+    await this.friendshipModel
       .findOneAndDelete(
         {
           friendId: user._id,
@@ -111,6 +111,22 @@ export class FriendshipService {
     return false;
   }
 
+  async findFriend(req, friendId: string) {
+    const user = await this.userService.findOneById(req.user.userId);
+    return await this.friendshipModel
+      .findOne({
+        userId: user._id,
+        friendId: friendId,
+        status: StatusFriendship.FRIEND,
+      })
+      .select('userId status')
+      .populate({
+        path: 'userId',
+        select: 'name email imageUrl',
+      })
+      .lean(); // Chuyển kết quả sang object JSON thuần
+  }
+
   async getListFriends(req) {
     const user = await this.userService.findOneById(req.user.userId);
     return await this.friendshipModel
@@ -123,7 +139,7 @@ export class FriendshipService {
         path: 'userId',
         select: 'name email imageUrl',
       })
-      .lean(); // Chuyển kết quả sang object JSON thuần
+      .lean();
   }
 
   async getListRequestFriends(req) {
@@ -148,5 +164,46 @@ export class FriendshipService {
         friendId: user._id,
         status: StatusFriendship.PENDING,
       });
+  }
+
+  async findUsersByName(req, name: string) {
+    const me = await this.userService.findOneById(req.user.userId);
+    const users = await this.userService.findUsersByName(name);
+
+    const usersMap = new Map(
+      users.flatMap(user => [
+        [user._id.toString(), user]
+      ])
+    );
+
+    let userIds: any = users
+      .filter(user => user._id.toString() !== req.user.userId)
+      .map(user => user._id);
+
+    const friendships = await this.friendshipModel
+      .find({
+        userId: me._id,
+        friendId: { $in: userIds }
+      })
+      .populate({ path: 'friendId', select: 'name email imageUrl' })
+      .select('friendId status')
+      .exec();
+
+    const userIdsInResults = new Set(
+      friendships.flatMap((friendship: any) => [
+        friendship.friendId._id.toString()
+      ])
+    );
+
+    userIds = userIds.map(userId => userId.toString());
+
+    const missingFriendships = userIds
+      .filter(userId => !userIdsInResults.has(userId))
+      .map(userId => ({
+        friendId: usersMap.get(userId),
+        status: null
+      }));
+
+    return [...friendships, ...missingFriendships];
   }
 }

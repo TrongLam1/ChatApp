@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { FriendshipDto } from './dto/friendship.dto';
 import { FriendshipService } from './friendship.service';
@@ -25,6 +25,12 @@ export class FriendshipController {
     return this.friendshipService.cancelFriendship(req, friendshipDto.friendId);
   }
 
+  @Get('find-friend/:friendId')
+  @UseGuards(JwtAuthGuard)
+  async findFriend(@Req() req, @Param('friendId') friendId: string) {
+    return this.friendshipService.findFriend(req, friendId);
+  }
+
   @Get('list-friends')
   @UseGuards(JwtAuthGuard)
   async getListFriends(@Req() req) {
@@ -41,5 +47,11 @@ export class FriendshipController {
   @UseGuards(JwtAuthGuard)
   async countRequestFriends(@Req() req) {
     return this.friendshipService.countRequestFriends(req);
+  }
+
+  @Get('find-by-name/:name')
+  @UseGuards(JwtAuthGuard)
+  async findUserByName(@Req() req, @Param('name') name: string) {
+    return await this.friendshipService.findUsersByName(req, name);
   }
 }

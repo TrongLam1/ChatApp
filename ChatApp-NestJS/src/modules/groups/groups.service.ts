@@ -1,18 +1,16 @@
 import { BadRequestException, Body, Injectable, NotFoundException } from '@nestjs/common';
-import { Group } from './schemas/group.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FriendshipService } from '../friendship/friendship.service';
-import { GroupDto } from './dto/group.dto';
-import { UsersService } from '../users/users.service';
 import { GroupMembersService } from '../group-members/group-members.service';
+import { UsersService } from '../users/users.service';
+import { GroupDto } from './dto/group.dto';
+import { Group } from './schemas/group.schema';
 
 @Injectable()
 export class GroupsService {
   constructor(
     @InjectModel(Group.name)
     private readonly groupModel: Model<Group>,
-    private readonly friendshipService: FriendshipService,
     private readonly userService: UsersService,
     private readonly groupMemberService: GroupMembersService,
   ) { }

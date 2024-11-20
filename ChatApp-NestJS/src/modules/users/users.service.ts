@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { match } from 'assert';
 
 @Injectable()
 export class UsersService {
@@ -135,5 +136,11 @@ export class UsersService {
       email: user.email,
       avatar: user.imageUrl
     }
+  }
+
+  async findUsersByName(name: string) {
+    return await this.userModel.find(
+      { name: { $regex: name, $options: 'i' } }
+    ).select('_id name imageUrl');
   }
 }

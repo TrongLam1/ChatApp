@@ -25,20 +25,37 @@ export class ChannelsService {
   async findChannel(req, friendId: string) {
     if (req.user.userId === friendId) throw new BadRequestException("Người nhận không hợp lệ.");
 
-    let channel = await this.channelModel.findOne({
-      userId: req.user.userId, friendId
-    });
+    let channel: any = await this.channelModel
+      .findOne({
+        userId: req.user.userId, friendId
+      })
+      .populate({
+        path: 'friendId',
+        select: 'name email imageUrl',
+      });
 
     if (!channel) {
-      channel = await this.channelModel.findOne({
-        friendId, userId: req.user.userId
-      });
+      channel = await this.channelModel
+        .findOne({
+          friendId, userId: req.user.userId
+        })
+        .populate({
+          path: 'friendId',
+          select: 'name email imageUrl',
+        });
 
       if (!channel) {
         return await this.createNewChannel(req, friendId);
       }
     }
 
-    return channel;
+    return {
+      channelId: channel._id,
+      friend: {
+        friendId: channel.friendId._id,
+        name: channel.friendId.name,
+        avatar: channel.friendId.imageUrl
+      },
+    };
   }
 }

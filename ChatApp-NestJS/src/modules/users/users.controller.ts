@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { Public } from 'src/decorator/decorator';
+import { Body, Controller, Get, Param, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { Public } from 'src/decorator/decorator';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
@@ -33,5 +33,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async getProfile(@Req() req) {
     return await this.usersService.getProfile(req);
+  }
+
+  @Get('name/:name')
+  @Public()
+  @UseGuards(JwtAuthGuard)
+  async findName(@Param('name') name: string) {
+    return await this.usersService.findUsersByName(name);
   }
 }
