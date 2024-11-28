@@ -15,6 +15,15 @@ export class GroupsService {
     private readonly groupMemberService: GroupMembersService,
   ) { }
 
+  private async findById(groupId: string) {
+    const group = await this.groupModel.findOne({
+      _id: groupId, isAvailable: true
+    });
+    if (!group) throw new NotFoundException("Không tìm thấy nhóm.");
+
+    return group;
+  }
+
   async createGroup(req, @Body() groupDto: GroupDto) {
     const { groupName, memberIds } = groupDto;
     const admin = await this.userService.findOneById(req.user.userId);
@@ -34,25 +43,40 @@ export class GroupsService {
   }
 
   async findGroupById(groupId: string) {
-    const group = await this.groupModel.findOne({
-      _id: groupId, isAvailable: true
-    });
-    if (!group) throw new NotFoundException("Không tìm thấy nhóm.");
-    return group;
+    const group = await this.findById(groupId);
+
+    const countMembers = await this.groupMemberService.countMembersInGroup(groupId);
+
+    return {
+      group: {
+        id: groupId,
+        groupName: group.groupName
+      },
+      members: countMembers
+    };
   }
 
   async addMember(req, groupId: string, memberId: string) {
     const user: any = await this.userService.findOneById(req.user.userId);
-    const group = await this.findGroupById(groupId);
+
+    const group = await this.findById(groupId);
+
     const member: any = await this.userService.findOneById(memberId);
     await this.groupMemberService.addMember(user._id, member._id, group);
   }
 
   async getListMembersGroup(req, groupId: string) {
     const user: any = await this.userService.findOneById(req.user.userId);
-    const group = await this.findGroupById(groupId);
+    const group = await this.findById(groupId);
 
-    return await this.groupMemberService.getListMembersGroup(user._id, group);
+    return await this.groupMemberService.getListMembersGroup(user, group);
+  }
+
+  async getListFriendsInvite(req, groupId: string) {
+    const user: any = await this.userService.findOneById(req.user.userId);
+    const group = await this.findById(groupId);
+
+    return await this.groupMemberService.getListFriendsInvite(req, user, group);
   }
 
   async getListGroupsByUser(req) {
@@ -62,7 +86,12 @@ export class GroupsService {
 
   async removeMember(req, groupId: string, memberId: string) {
     const user: any = await this.userService.findOneById(req.user.userId);
-    const group: any = await this.findGroupById(groupId);
+
+    const group = await this.groupModel.findOne({
+      _id: groupId, isAvailable: true
+    });
+    if (!group) throw new NotFoundException("Không tìm thấy nhóm.");
+
     if (group.admin.toString() !== user._id.toString())
       throw new BadRequestException("Bạn không có quyền xóa thành viên khỏi nhóm.");
 

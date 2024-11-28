@@ -29,10 +29,22 @@ export class GroupsController {
     return await this.groupsService.getListMembersGroup(req, groupId);
   }
 
+  @Get('friends-invite/:groupId')
+  @UseGuards(JwtAuthGuard)
+  async getListFriendsInvite(@Req() req, @Param('groupId') groupId: string) {
+    return await this.groupsService.getListFriendsInvite(req, groupId);
+  }
+
   @Get('list-groups-by-user')
   @UseGuards(JwtAuthGuard)
   async getListGroupsByUser(@Req() req) {
     return await this.groupsService.getListGroupsByUser(req);
+  }
+
+  @Get('find-group/:groupId')
+  @UseGuards(JwtAuthGuard)
+  async findGroupById(@Param('groupId') groupId: string) {
+    return await this.groupsService.findGroupById(groupId);
   }
 
   @Delete('remove-member')

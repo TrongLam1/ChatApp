@@ -146,12 +146,12 @@ export class FriendshipService {
     const user = await this.userService.findOneById(req.user.userId);
     return await this.friendshipModel
       .find({
-        friendId: user._id,
+        userId: user._id,
         status: StatusFriendship.PENDING,
       })
-      .select('userId status')
+      .select('status')
       .populate({
-        path: 'userId',
+        path: 'friendId',
         select: 'name email imageUrl',
       })
       .lean();
@@ -176,13 +176,17 @@ export class FriendshipService {
       ])
     );
 
-    let userIds: any = users
+    const userIds: any = users
       .filter(user => user._id.toString() !== req.user.userId)
       .map(user => user._id);
 
+    return await this.findFriendshipsByUserIds(me, userIds, usersMap);
+  }
+
+  async findFriendshipsByUserIds(user, userIds, usersMap) {
     const friendships = await this.friendshipModel
       .find({
-        userId: me._id,
+        userId: user._id,
         friendId: { $in: userIds }
       })
       .populate({ path: 'friendId', select: 'name email imageUrl' })
@@ -199,10 +203,19 @@ export class FriendshipService {
 
     const missingFriendships = userIds
       .filter(userId => !userIdsInResults.has(userId))
-      .map(userId => ({
-        friendId: usersMap.get(userId),
-        status: null
-      }));
+      .map(userId => {
+        if (usersMap.get(userId)._id.toString() !== user._id.toString()) {
+          return {
+            friendId: usersMap.get(userId),
+            status: null
+          }
+        } else {
+          return {
+            friendId: usersMap.get(userId),
+            status: 'friend'
+          }
+        }
+      });
 
     return [...friendships, ...missingFriendships];
   }
