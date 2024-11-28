@@ -9,6 +9,8 @@ import { useTab } from "@/providers/tabProvider";
 import FriendComponent from "../friend/friendComponent";
 import AddFriendModal from "@/components/modal/addFriend/addFriendModal";
 import { useRouter } from "next/navigation";
+import CreateGroupModal from "@/components/modal/createGroup/createGroupModal";
+import WaitingAcceptComponent from "../friend/waitingAccept";
 
 export default function ListFriendsComponent(props: any) {
     const router = useRouter();
@@ -74,30 +76,44 @@ export default function ListFriendsComponent(props: any) {
                 </div>
             </div>
             <div className='list-chats'>
-                {listContacts && listContacts.length > 0 &&
+                {/* {listContacts && listContacts.length > 0 &&
                     listContacts.map((item: any, index: number) => {
-                        return (<FriendComponent friend={item} key={`friend-${index}`}
+                        const contact = {
+                            id: item?.userId?._id || item?.group?._id,
+                            name: item?.userId?.name || item?.group?.groupName,
+                            avatar: item?.userId?.imageUrl || null,
+                            isGroup: tab === 'groups' ? true : false
+                        };
+
+                        return (<FriendComponent contact={contact} key={`friend-${index}`}
                             setChatWith={setChatWith} token={token}
                         />)
-                    })}
-                {/* {listChats && listChats.length > 0 ?
-                    listChats.map((item, index) => {
+                    })} */}
+                {listContacts && listContacts.length > 0 ?
+                    listContacts.map((item: any, index: number) => {
+                        let contact = null;
+                        if (tab !== 'accepts') {
+                            contact = {
+                                id: item?.userId?._id || item?.group?._id,
+                                name: item?.userId?.name || item?.group?.groupName,
+                                avatar: item?.userId?.imageUrl || null,
+                                isGroup: tab === 'groups' ? true : false
+                            };
+                        }
+
                         return tab === 'accepts' ?
-                            (<WaitingAcceptFriend item={item} key={`friend-${index}`}
-                                getListChatsWaitingAccept={getListChatsWaitingAccept}
-                                refreshAmountRequest={fetchAmountRequestsAddFriend}
+                            (<WaitingAcceptComponent contact={item} key={`friend-${index}`} token={token}
                             />)
                             :
-                            (<Friend item={item} key={`friend-${index}`} tab={tab}
-                                setChatWith={setChatWith}
-                                handleShowContentForTab={handleShowContentForTab}
+                            (<FriendComponent contact={contact} key={`friend-${index}`}
+                                setChatWith={setChatWith} token={token}
                             />)
                     }) : <div className='no-content'>No content</div>
-                } */}
+                }
             </div>
             {openModalUserInfo && <AddFriendModal token={token} />}
-            {/* {openModalCreateGroup && <CreateGroup open={openModalCreateGroup}
-                setOpen={setOpenModalCreateGroup} />} */}
+            {openModalCreateGroup && <CreateGroupModal open={openModalCreateGroup}
+                setOpen={setOpenModalCreateGroup} token={token} />}
         </div>
     );
 }

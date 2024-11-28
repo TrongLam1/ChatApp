@@ -1,7 +1,7 @@
 import { sendRequest } from "@/utils/api";
-import { InactiveAccountError, InvalidEmailPasswordError } from "@/utils/error";
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
+import { InvalidEmailPasswordError, NotFoundUserError } from "@/utils/error";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
@@ -40,19 +40,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             id: res.data.user.id,
                             email: res.data.user.email,
                             username: res.data.user.username,
-                            phone: res.data.user.phone,
-                            address: res.data.user.address,
-                            role: res.data.user.roles,
+                            phone: res.data.user.phone
                         },
                         token: res.data.access_token,
                         refresh_token: res.data.refresh_token
-                    }
+                    };
                 }
 
-                if (+res.statusCode === 401) throw new InvalidEmailPasswordError();
-
-                if (+res.statusCode === 400) {
-                    throw new InactiveAccountError();
+                if (+res.statusCode === 401) {
+                    throw new InvalidEmailPasswordError();
+                } else if (+res.statusCode === 404) {
+                    throw new NotFoundUserError();
                 } else { throw new Error("Internal server error"); }
             },
         }),

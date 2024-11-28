@@ -38,4 +38,17 @@ declare global {
     interface IFriendship {
         friendId: string;
     }
+
+    interface IContactObject {
+        id: string | null;
+        name: string | null;
+        avatar: string | null;
+        isGroup: boolean | null,
+        members: number | null;
+    }
+
+    interface ICreateGroup {
+        groupName: string;
+        memberIds: string[];
+    }
 }

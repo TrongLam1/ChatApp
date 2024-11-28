@@ -1,22 +1,34 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import avatar from '@/assets/images/avatar.png';
 import group from '@/assets/images/group.png';
 import './detailComponent.scss';
 import { useContactObject } from '@/providers/contactObjectProvider';
 import { useTab } from '@/providers/tabProvider';
 import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleDown, faCircleUp, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { GetListMembersGroup } from '../../app/api/groupApi';
+import { toast } from 'react-toastify';
+import MemberComponent from './memberGroup/memberComponent';
+import InviteFriendComponent from '../modal/inviteFriend/inviteFriendComponent';
 
 export default function DetailComponent(props: any) {
 
+    const { token } = props;
     const { tab } = useTab();
     const { contactObject } = useContactObject();
 
     const [openModal, setOpenModal] = useState(false);
-    const [userDetail, setUserDetail] = useState('');
     const [isShowMembers, setIsShowMembers] = useState(false);
     const [membersOfGroup, setMembersOfGroup] = useState([]);
+
+    useEffect(() => {
+        if (contactObject?.isGroup) {
+            getListMembersGroup();
+        }
+    }, [contactObject]);
 
     const handleSetAvatar = () => {
         if (contactObject.isGroup) {
@@ -24,6 +36,13 @@ export default function DetailComponent(props: any) {
         } else {
             return contactObject.avatar ?? avatar;
         }
+    };
+
+    const getListMembersGroup = async () => {
+        const res = await GetListMembersGroup(token, contactObject.id);
+        if (res.statusCode === 200) {
+            setMembersOfGroup(res.data);
+        } else { toast.error(res.message); }
     };
 
     return (
@@ -46,32 +65,32 @@ export default function DetailComponent(props: any) {
                                     <span>Privacy & help</span>
                                 </div>
                             </div>
-                            {/* {tab === 'groups' &&
+                            {tab === 'groups' &&
                                 <div className='option'>
                                     <div className='title'>
                                         <div className='members-container'>
                                             <span>Members</span>
-                                            <i className="fa-solid fa-user-plus"
-                                                onClick={() => setOpenModal(!openModal)}
-                                            ></i>
+                                            <FontAwesomeIcon icon={faUserPlus}
+                                                onClick={() => setOpenModal(!openModal)} />
                                         </div>
-                                        <i className={isShowMembers ? "fa-regular fa-circle-down" : "fa-regular fa-circle-up"}
-                                            onClick={showMembersOfGroup}></i>
+                                        {isShowMembers ?
+                                            <FontAwesomeIcon icon={faCircleDown}
+                                                onClick={() => setIsShowMembers(!isShowMembers)} /> :
+                                            <FontAwesomeIcon icon={faCircleUp}
+                                                onClick={() => setIsShowMembers(!isShowMembers)} />}
                                     </div>
                                     {isShowMembers &&
                                         <div className='list-members'>
                                             {membersOfGroup && membersOfGroup.length > 0 &&
                                                 membersOfGroup.map((item, index) => {
-                                                    return (<MemberGroup
-                                                        key={`members-${index}`} item={item}
-                                                        groupId={chatWith}
-                                                        refreshMembers={getMembersOfGroup} />)
+                                                    return (<MemberComponent
+                                                        key={`members-${index}`} member={item} />)
                                                 })
                                             }
                                         </div>
                                     }
                                 </div>
-                            } */}
+                            }
                             {/* {tab === 'groups' &&
                                 <button type='button' onClick={handleQuitOutGroup}>Quit</button>
                             } */}
@@ -79,7 +98,7 @@ export default function DetailComponent(props: any) {
                     </>
                 }
             </div>
-            {/* <InviteUsers open={openModal} setOpen={setOpenModal} groupId={chatWith} /> */}
+            {openModal && <InviteFriendComponent token={token} />}
         </>
     );
 }

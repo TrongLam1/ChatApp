@@ -1,0 +1,95 @@
+.add-user-modal {
+    min-width: 400px;
+    width: max-content;
+    height: max-content;
+    padding: 25px;
+    background-color: rgba(17, 25, 40, .781);
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    form {
+        display: flex;
+        gap: 20px;
+
+        input {
+            flex: 1;
+            padding: 5px 10px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            height: 40px;
+            font-size: .9rem;
+        }
+
+        .search-btn {
+            padding: 5px 10px;
+            border-radius: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            height: 40px;
+            font-size: .9rem;
+        }
+    }
+
+    .list-users {
+        max-height: 23.125rem;
+        overflow-y: auto;
+        margin-top: 1rem;
+        padding-right: 10px;
+        scrollbar-width: thin;
+
+        .user {
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .detail {
+                display: flex;
+                gap: 20px;
+                align-items: center;
+                color: white;
+
+                img {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                }
+            }
+
+            .no-content {
+                color: white;
+            }
+
+            button {
+                padding: 8px;
+                border-radius: 10px;
+                background-color: #1a73e8;
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-size: .9rem;
+                width: 60px;
+
+                &:disabled {
+                    background-color: #ccc;
+                }
+            }
+
+            .accept-friend-btn {
+                background-color: #31c74a;
+            }
+
+            .cancel-friend-btn {
+                background-color: #ca2121;
+            }
+        }
+    }
+}

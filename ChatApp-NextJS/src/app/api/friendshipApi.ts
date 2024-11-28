@@ -58,3 +58,14 @@ export async function CountRequestFriends(token: string) {
         headers: { Authorization: `Bearer ${token}` },
     });
 };
+
+export async function FindUsersByName(token: string, name: string) {
+    return await sendRequest<IBackendRes<any>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/friendship/find-by-name/${name}`,
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+        nextOption: {
+            next: { tags: [`users-name-${name}`] }
+        }
+    });
+};

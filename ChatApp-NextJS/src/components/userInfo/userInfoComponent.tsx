@@ -7,14 +7,13 @@ import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import avatar from '../../assets/images/avatar.png';
 import './userInfoComponent.scss';
+import { signOut } from 'next-auth/react';
 
 export default function UserInfoComponent(props: any) {
 
     const { user } = props;
 
     const [open, setOpen] = useState(false);
-
-    const logOut = () => { }
 
     return (
         <>
@@ -31,7 +30,9 @@ export default function UserInfoComponent(props: any) {
 
                         <Dropdown.Menu>
                             <Dropdown.Item onClick={() => setOpen(!open)}>Profile</Dropdown.Item>
-                            <Dropdown.Item onClick={logOut}>Logout</Dropdown.Item>
+                            <Dropdown.Item onClick={() => signOut({ callbackUrl: '/login' })}>
+                                Logout
+                            </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>

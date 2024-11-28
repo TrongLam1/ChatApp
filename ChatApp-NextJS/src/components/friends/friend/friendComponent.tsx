@@ -1,16 +1,18 @@
 'use client'
 
-import avatar from '../../../assets/images/avatar.png';
-import './friendComponent.scss';
-import Image from "next/image";
 import { FindChannel } from "@/app/api/channelApi";
-import { useTab } from '@/providers/tabProvider';
 import { useContactObject } from '@/providers/contactObjectProvider';
+import { useTab } from '@/providers/tabProvider';
+import Image from "next/image";
 import { toast } from 'react-toastify';
+import avatar from '../../../assets/images/avatar.png';
+import group from '@/assets/images/group.png';
+import './friendComponent.scss';
+import { FindGroupById } from "@/app/api/groupApi";
 
 export default function FriendComponent(props: any) {
 
-    const { friend, token } = props;
+    const { contact, token } = props;
 
     const { tab } = useTab();
     const { setContactObject } = useContactObject();
@@ -25,12 +27,22 @@ export default function FriendComponent(props: any) {
     };
 
     const handleSubscribeGroup = async (groupId: string) => {
-
+        const res = await FindGroupById(token, groupId);
+        if (res.statusCode === 200) {
+            setContactObject({
+                id: res.data.group.id,
+                name: res.data.group.groupName,
+                isGroup: true,
+                members: res.data.members
+            });
+        } else {
+            toast.error(res.message);
+        }
     };
 
     const formatTime = () => {
-        if (friend?.lastMessage?.createAt !== undefined) {
-            const dateString = friend?.lastMessage?.createAt;
+        if (contact?.lastMessage?.createAt !== undefined) {
+            const dateString = contact?.lastMessage?.createAt;
 
             const date = new Date(dateString);
 
@@ -46,12 +58,14 @@ export default function FriendComponent(props: any) {
 
     return (
         <div className='friend'
-            onClick={() => { tab === 'friends' ? handleSubscribeChannel(friend.userId._id) : handleSubscribeGroup(friend?.groupId) }}>
-            <Image src={friend?.avatar || friend?.image_url ? friend?.avatar || friend?.imageUrl : avatar} alt='' />
+            onClick={() => { tab === 'friends' ? handleSubscribeChannel(contact.id) : handleSubscribeGroup(contact.id) }}>
+            {contact.isGroup ?
+                <Image src={group} alt='' /> :
+                <Image src={contact?.avatar ? contact?.avatar : avatar} alt='' />}
             <div className='texts'>
                 <div className='info'>
                     <div className='title-info'>
-                        <span>{friend.userId.name || friend.groupName}</span>
+                        <span>{contact?.name}</span>
                         <p>{formatTime()}</p>
                     </div>
                     {/* {friend.lastMessage &&

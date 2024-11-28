@@ -1,13 +1,21 @@
 'use client'
 
+import { useTab } from "@/providers/tabProvider";
 import ChatComponent from "../chat/chatComponent";
 import DetailComponent from "../detail/detailComponent";
 import ListFriendsComponent from "../friends/listFriends/listFriendsComponent";
 import './homePageComponent.scss';
+import { useEffect } from "react";
 
 export default function HomePageComponent(props: any) {
 
-    const { user, token, listContacts } = props;
+    const { user, token, listContacts, tab } = props;
+
+    const { setTab } = useTab();
+
+    useEffect(() => {
+        if (tab !== undefined) setTab(tab);
+    }, []);
 
     return (
         <div className='home-page-container'>

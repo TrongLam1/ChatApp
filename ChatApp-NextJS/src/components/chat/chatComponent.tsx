@@ -7,11 +7,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faImage, faPhone, faVideo } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import { useContactObject } from "@/providers/contactObjectProvider";
+import { useTab } from "@/providers/tabProvider";
 
 export default function ChatComponent(props: any) {
 
-    const { tab, receiver, description } = props;
-
+    const { tab } = useTab();
     const { contactObject } = useContactObject();
 
     const [open, setOpen] = useState(false);
@@ -33,7 +33,7 @@ export default function ChatComponent(props: any) {
                                 <Image src={avatar} alt='avatar' />
                                 <div className='texts'>
                                     <span className='receiver'>{contactObject.name}</span>
-                                    {tab === 'groups' && contactObject.members &&
+                                    {tab === 'groups' &&
                                         <span>{contactObject.members} members</span>
                                     }
                                 </div>

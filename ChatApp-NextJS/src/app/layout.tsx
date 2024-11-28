@@ -7,6 +7,8 @@ import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce, ToastContainer } from "react-toastify";
 import NextAuthWrapper from "@/libs/next.auth.wrapper";
+import { TabProvider } from "@/providers/tabProvider";
+import { ContactObjectProvider } from "@/providers/contactObjectProvider";
 
 config.autoAddCss = false;
 
@@ -27,7 +29,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <div className="app-container">{children}</div>
+        <NextAuthWrapper>
+          <TabProvider>
+            <ContactObjectProvider>
+              <div className="app-container">
+                {children}
+              </div>
+            </ContactObjectProvider>
+          </TabProvider>
+        </NextAuthWrapper>
         <ToastContainer
           position="top-right"
           autoClose={2000}

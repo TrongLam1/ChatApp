@@ -1,11 +1,31 @@
 import HomePageComponent from "@/components/homePage/homePageComponent";
 import { auth } from "../../auth";
+import { GetListFriends, GetListRequestFriends } from "./api/friendshipApi";
+import { GetListGroupsOfUser } from "./api/groupApi";
 
-export default async function Home() {
+export default async function Home({ searchParams }: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
 
-  // const session = await auth();
+  const session = await auth();
+  const user = session?.user.user;
+  const token = session?.user.token;
+
+  const tab = searchParams.tab;
+  let listContacts = null;
+
+  if (tab === 'groups') {
+    const res = await GetListGroupsOfUser(token);
+    listContacts = res.data;
+  } else if (tab === 'accepts') {
+    const res = await GetListRequestFriends(token);
+    listContacts = res.data;
+  } else {
+    const res = await GetListFriends(token);
+    listContacts = res.data;
+  }
 
   return (
-    <HomePageComponent />
+    <HomePageComponent tab={tab} user={user} token={token} listContacts={listContacts} />
   );
 }
