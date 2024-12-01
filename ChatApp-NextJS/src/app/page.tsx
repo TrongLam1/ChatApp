@@ -1,6 +1,6 @@
 import HomePageComponent from "@/components/homePage/homePageComponent";
 import { auth } from "../../auth";
-import { GetListFriends, GetListRequestFriends } from "./api/friendshipApi";
+import { CountRequestFriends, GetListFriends, GetListRequestFriends } from "./api/friendshipApi";
 import { GetListGroupsOfUser } from "./api/groupApi";
 
 export default async function Home({ searchParams }: {
@@ -14,6 +14,8 @@ export default async function Home({ searchParams }: {
   const tab = searchParams.tab;
   let listContacts = null;
 
+  const countRequest = await CountRequestFriends(token);
+
   if (tab === 'groups') {
     const res = await GetListGroupsOfUser(token);
     listContacts = res.data;
@@ -26,6 +28,7 @@ export default async function Home({ searchParams }: {
   }
 
   return (
-    <HomePageComponent tab={tab} user={user} token={token} listContacts={listContacts} />
+    <HomePageComponent tab={tab} user={user} token={token}
+      countRequest={countRequest.data} listContacts={listContacts} />
   );
 }

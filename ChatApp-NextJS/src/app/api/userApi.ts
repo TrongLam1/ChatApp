@@ -1,6 +1,6 @@
 'use server'
 
-import { sendRequest } from "@/utils/api";
+import { sendRequest, sendRequestFile } from "@/utils/api";
 
 export async function Register(username: string, email: string, password: string) {
     return await sendRequest<IBackendRes<any>>({
@@ -29,11 +29,11 @@ export async function UpdateProfile(token: string, body: IProfile) {
     });
 }
 
-export async function ChangeAvatar(token: string, file: any) {
-    return await sendRequest<IBackendRes<any>>({
+export async function ChangeAvatar(token: string, formData: any) {
+    return await sendRequestFile<IBackendRes<any>>({
         url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/change-avatar`,
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
-        body: { file }
+        body: formData
     });
 }

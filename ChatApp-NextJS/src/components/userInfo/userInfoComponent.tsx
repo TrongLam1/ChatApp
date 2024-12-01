@@ -2,16 +2,17 @@
 
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Image from 'next/image';
+import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import avatar from '../../assets/images/avatar.png';
+import ProfileComponent from './profile/profileComponent';
 import './userInfoComponent.scss';
-import { signOut } from 'next-auth/react';
+import Image from 'next/image';
 
 export default function UserInfoComponent(props: any) {
 
-    const { user } = props;
+    const { user, token } = props;
 
     const [open, setOpen] = useState(false);
 
@@ -19,7 +20,10 @@ export default function UserInfoComponent(props: any) {
         <>
             <div className='user-info-container'>
                 <div className='user'>
-                    <Image src={user?.avatar ? user?.avatar : avatar} alt='' />
+                    <div className='avatar'>
+                        <Image src={user?.avatar ? user?.avatar : avatar} alt='avatar'
+                            width={50} height={50} />
+                    </div>
                     <h5>{user?.username}</h5>
                 </div>
                 <div className='icons'>
@@ -37,7 +41,7 @@ export default function UserInfoComponent(props: any) {
                     </Dropdown>
                 </div>
             </div>
-            {/* <UserProfile username={user.username} open={open} setOpen={setOpen} /> */}
+            {open && <ProfileComponent token={token} user={user} setOpen={setOpen} />}
         </>
     )
 }

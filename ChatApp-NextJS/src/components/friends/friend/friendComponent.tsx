@@ -60,8 +60,9 @@ export default function FriendComponent(props: any) {
         <div className='friend'
             onClick={() => { tab === 'friends' ? handleSubscribeChannel(contact.id) : handleSubscribeGroup(contact.id) }}>
             {contact.isGroup ?
-                <Image src={group} alt='' /> :
-                <Image src={contact?.avatar ? contact?.avatar : avatar} alt='' />}
+                <Image src={group} alt='' width={50} height={50} /> :
+                <Image src={contact?.avatar ? contact?.avatar : avatar} alt=''
+                    width={50} height={50} />}
             <div className='texts'>
                 <div className='info'>
                     <div className='title-info'>

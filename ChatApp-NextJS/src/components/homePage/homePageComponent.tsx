@@ -6,12 +6,17 @@ import DetailComponent from "../detail/detailComponent";
 import ListFriendsComponent from "../friends/listFriends/listFriendsComponent";
 import './homePageComponent.scss';
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomePageComponent(props: any) {
-
-    const { user, token, listContacts, tab } = props;
+    const router = useRouter();
+    const { user, token, listContacts, tab, countRequest } = props;
 
     const { setTab } = useTab();
+
+    useEffect(() => {
+        if (!!user === false) router.push('/login');
+    }, []);
 
     useEffect(() => {
         if (tab !== undefined) setTab(tab);
@@ -20,10 +25,10 @@ export default function HomePageComponent(props: any) {
     return (
         <div className='home-page-container'>
             <ListFriendsComponent
-                user={user} token={token} listContacts={listContacts}
+                user={user} token={token} listContacts={listContacts} countRequest={countRequest}
             />
             <ChatComponent token={token} />
-            <DetailComponent token={token} />
+            <DetailComponent token={token} user={user} />
         </div>
     );
 };

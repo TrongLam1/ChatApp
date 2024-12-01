@@ -18,7 +18,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             id: userData.user.id,
                             email: userData.user.email,
                             username: userData.user.username,
-                            role: userData.user.roles,
                         },
                         token: userData.access_token,
                         refresh_token: userData.refresh_token
@@ -35,12 +34,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 });
 
                 if (+res.statusCode === 201) {
+                    console.log(res.data);
                     return {
                         user: {
                             id: res.data.user.id,
                             email: res.data.user.email,
                             username: res.data.user.username,
-                            phone: res.data.user.phone
+                            phone: res.data.user.phone,
+                            avatar: res.data.user.avatar
                         },
                         token: res.data.access_token,
                         refresh_token: res.data.refresh_token
@@ -59,7 +60,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: "/auth/login"
     },
     callbacks: {
-        jwt({ token, user }) {
+        jwt({ token, user, trigger, session }) {
+            if (trigger === 'update' && session?.username) {
+                token.user.user.username = session.username;
+                return token;
+            }
+
+            if (trigger === 'update' && session?.avatar) {
+                token.user.user.avatar = session.avatar;
+                return token;
+            }
+
             if (user) token.user = user;
             return token;
         },

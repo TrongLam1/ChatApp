@@ -69,6 +69,8 @@
                 margin: 5px 0;
                 overflow-y: auto;
                 max-height: 200px;
+                scrollbar-width: thin;
+                padding-right: 10px;
             }
 
             .photos {

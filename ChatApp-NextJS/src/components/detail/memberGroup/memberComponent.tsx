@@ -1,15 +1,19 @@
 'use client'
 
+import { RemoveMember } from '@/app/api/groupApi';
+import avatar from '@/assets/images/avatar.png';
+import ConfirmModal from '@/components/modal/confirmModal/confirmModal';
+import { useContactObject } from '@/providers/contactObjectProvider';
+import { faCircleXmark, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
 import { useState } from 'react';
 import './memberComponent.scss';
-import avatar from '@/assets/images/avatar.png';
-import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleXmark, faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import ConfirmModal from '@/components/modal/confirmModal/confirmModal';
+import { toast } from 'react-toastify';
 
 export default function MemberComponent(props: any) {
-    const { member } = props;
+    const { member, token, updateInfoGroup, setMembersOfGroup } = props;
+    const { contactObject, setContactObject } = useContactObject();
 
     const [user, setUser] = useState(member.friendId);
     const [status, setStatus] = useState(member.status);
@@ -31,7 +35,21 @@ export default function MemberComponent(props: any) {
     };
 
     const handleRemoveMember = async () => {
-
+        const res = await RemoveMember(token, {
+            groupId: contactObject.id, memberId: user._id
+        });
+        if (res.statusCode === 200) {
+            updateInfoGroup();
+            setContactObject({
+                ...contactObject, members: contactObject.members - 1
+            });
+            setMembersOfGroup((prevMembers: any[]) => {
+                prevMembers.filter((member) => member._id !== user._id)
+            });
+        } else {
+            toast.error(res.message);
+            closeModal();
+        }
     };
 
     return (

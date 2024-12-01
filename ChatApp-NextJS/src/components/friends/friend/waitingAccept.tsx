@@ -4,7 +4,6 @@ import { AcceptFriend } from '@/app/api/friendshipApi';
 import avatar from '@/assets/images/avatar.png';
 import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -32,7 +31,7 @@ export default function WaitingAcceptComponent(props: any) {
             {user &&
                 <div className='friend'>
                     <div className='accept-info'>
-                        <Image src={user?.avatar ? user?.avatar : avatar} alt='' />
+                        <img src={user?.avatar ? user?.avatar : avatar} alt='' />
                         <div className='texts'>
                             <span>{user?.name}</span>
                         </div>

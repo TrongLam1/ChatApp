@@ -32,7 +32,7 @@ declare global {
 
     interface IProfile {
         username: string;
-        phone: string;
+        phone: string | null;
     }
 
     interface IFriendship {
@@ -49,6 +49,11 @@ declare global {
 
     interface ICreateGroup {
         groupName: string;
+        memberIds: string[];
+    }
+
+    interface IAddMembers {
+        groupId: string;
         memberIds: string[];
     }
 }

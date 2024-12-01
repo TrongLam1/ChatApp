@@ -1,9 +1,8 @@
 'use client'
 
-import Image from 'next/image';
-import './memberGroupComponent.scss';
 import avatar from '@/assets/images/avatar.png';
 import { useState } from 'react';
+import './memberGroupComponent.scss';
 
 export default function MemberGroupComponent(props: any) {
     const { member, setListAddGroup } = props;
@@ -25,7 +24,7 @@ export default function MemberGroupComponent(props: any) {
         <div className="friend-group-item">
             <input type="checkbox" id={user?._id} onClick={(e) => handleAddFriendToGroup(e)} />
             <label htmlFor={user?._id}>
-                <Image src={user?.avatar ? user?.avatar : avatar} alt='' />
+                <img src={user?.avatar ? user?.avatar : avatar} alt='' />
                 <div className='texts'>
                     <div className='info'>
                         <p>{user?.name}</p>

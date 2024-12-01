@@ -1,18 +1,18 @@
 'use client'
 
-import { GetListFriendsInvite } from "@/app/api/groupApi";
+import { AddMembers, GetListFriendsInvite } from "@/app/api/groupApi";
 import { useContactObject } from "@/providers/contactObjectProvider";
 import { FormEvent, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import MemberGroupComponent from "../createGroup/memberGroupComponent";
 
 export default function InviteFriendComponent(props: any) {
-    const { token } = props;
+    const { token, getListMembersGroup, setOpen, setIsShowMembers, updateInfoGroup } = props;
 
     const { contactObject } = useContactObject();
 
     const [nameSearch, setNameSearch] = useState('');
     const [listFriends, setListFriends] = useState([]);
-    const [listFriendsSearch, setListFriendsSearch] = useState([]);
     const [listAddGroup, setListAddGroup] = useState([]);
 
     useEffect(() => {
@@ -26,9 +26,9 @@ export default function InviteFriendComponent(props: any) {
                 .filter((friend: any) => friend.userId.name.includes(nameSearch))
                 .map((friend: any) => ({ friend }));
 
-            setListFriendsSearch(search);
+            setListFriends(search);
         } else {
-            setListFriendsSearch(listFriends);
+            await getListFriends();
         }
 
     };
@@ -37,12 +37,25 @@ export default function InviteFriendComponent(props: any) {
         const res = await GetListFriendsInvite(token, contactObject.id);
         if (res.statusCode === 200) {
             setListFriends(res.data);
-            setListFriendsSearch(res.data);
         }
     };
 
     const handleAddUsersToGroup = async () => {
-        console.log(listAddGroup);
+        const body: IAddMembers = {
+            groupId: contactObject.id,
+            memberIds: listAddGroup
+        };
+
+        const res = await AddMembers(token, body);
+        if (res.statusCode === 201) {
+            toast.success("Add members successfully.");
+            getListMembersGroup();
+            setOpen(false);
+            setIsShowMembers(false);
+            updateInfoGroup();
+        } else {
+            toast.error(res.message);
+        }
     };
 
     return (
@@ -54,8 +67,8 @@ export default function InviteFriendComponent(props: any) {
                 <button className='search-btn'>Search</button>
             </form>
             <div className='user'>
-                {listFriendsSearch && listFriendsSearch.length > 0 &&
-                    listFriendsSearch.map((item: any, index: number) => {
+                {listFriends && listFriends.length > 0 &&
+                    listFriends.map((item: any, index: number) => {
                         return (<MemberGroupComponent key={`item-${index}`} member={item}
                             setListAddGroup={setListAddGroup} />)
                     })

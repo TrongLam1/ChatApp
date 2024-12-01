@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import avatar from '../../assets/images/avatar.png';
 import './chatComponent.scss';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,6 +18,8 @@ export default function ChatComponent(props: any) {
 
     const [message, setMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
+
+    useEffect(() => { }, [contactObject]);
 
     const handleSendMessage = async () => { }
 

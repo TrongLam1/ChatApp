@@ -1,3 +1,4 @@
+'use server'
 import { sendRequest } from "@/utils/api";
 
 export async function CreateGroup(token: string, body: ICreateGroup) {
@@ -9,11 +10,12 @@ export async function CreateGroup(token: string, body: ICreateGroup) {
     });
 };
 
-export async function AddMember(token: string, groupId: string, memberId: string) {
+export async function AddMembers(token: string, body: IAddMembers) {
     return await sendRequest<IBackendRes<any>>({
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/groups/add-member?groupId=${groupId}&memberId=${memberId}`,
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/groups/add-member`,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
+        body
     });
 };
 
@@ -49,11 +51,12 @@ export async function GetListGroupsOfUser(token: string) {
     });
 };
 
-export async function RemoveMember(token: string, groupId: string, memberId: string) {
+export async function RemoveMember(token: string, body: any) {
     return await sendRequest<IBackendRes<any>>({
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/groups/remove-member?groupId=${groupId}&memberId=${memberId}`,
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/groups/remove-member`,
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
+        body
     });
 };
 
