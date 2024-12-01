@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } fro
 import { GroupsService } from './groups.service';
 import { GroupDto } from './dto/group.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { AddMembersDto } from './dto/add-members.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -17,10 +18,9 @@ export class GroupsController {
   @UseGuards(JwtAuthGuard)
   async addMember(
     @Req() req,
-    @Query('groupId') groupId: string,
-    @Query('memberId') memberId: string,
+    @Body() addMembersDto: AddMembersDto
   ) {
-    return await this.groupsService.addMember(req, groupId, memberId);
+    return await this.groupsService.addMember(req, addMembersDto);
   }
 
   @Get('members/:groupId')
@@ -51,10 +51,9 @@ export class GroupsController {
   @UseGuards(JwtAuthGuard)
   async removeMember(
     @Req() req,
-    @Query('groupId') groupId: string,
-    @Query('memberId') memberId: string,
+    @Body() removeMembers: any
   ) {
-    return await this.groupsService.removeMember(req, groupId, memberId);
+    return await this.groupsService.removeMember(req, removeMembers.groupId, removeMembers.memberId);
   }
 
   @Delete('quit/:groupId')

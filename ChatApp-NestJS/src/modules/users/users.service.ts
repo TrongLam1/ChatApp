@@ -1,12 +1,11 @@
 import { BadRequestException, Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { hashPasswordHelper } from 'src/helpers/utils';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { match } from 'assert';
 
 @Injectable()
 export class UsersService {
@@ -74,10 +73,18 @@ export class UsersService {
   }
 
   async findOneById(_id: string) {
-    const user = await this.userModel.findOne({ _id });
+    const user = await this.userModel.findById({ _id });
     if (!user) throw new NotFoundException("Không tìm thấy thông tin người dùng.");
 
     return user;
+  }
+
+  async findByIds(userIds: string[]) {
+    return await this.userModel
+      .find({
+        _id: { $in: userIds }
+      })
+      .exec();
   }
 
   async getProfile(req: any) {

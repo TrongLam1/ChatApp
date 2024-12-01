@@ -25,7 +25,7 @@ export class UsersController {
   @Put('change-avatar')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async changeAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+  async changeAvatar(@Req() req, @UploadedFile() file) {
     return await this.usersService.changeAvatar(req, file);
   }
 

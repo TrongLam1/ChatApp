@@ -40,10 +40,12 @@ export class GroupMembersService {
         });
     }
 
-    async addMember(userId: string, memberId: string, group: any) {
+    async addMember(userId: string, members: any, group: any) {
         await this.checkedUserInGroup(userId, group);
 
-        await this.createGroupMember(memberId, group);
+        members.map(async (member: any) => {
+            await this.createGroupMember(member._id, group);
+        });
     }
 
     async getListMembersGroup(user, group: any) {
@@ -66,7 +68,8 @@ export class GroupMembersService {
         const memberIds: any = members
             .map((member: any) => member.user._id);
 
-        return this.friendshipService.findFriendshipsByUserIds(user, memberIds, membersMap);
+        return await this.friendshipService
+            .findFriendshipsByUserIds(user, memberIds, membersMap);
     }
 
     async getListFriendsInvite(req, user, group: any) {
@@ -92,22 +95,25 @@ export class GroupMembersService {
     }
 
     async getListGroupsByUser(userId: string) {
-        return await this.groupMemberModel
+        const groups = await this.groupMemberModel
             .find({ user: userId })
             .populate({
                 path: 'group',
+                match: { isAvailable: true },
                 select: '_id groupName'
             })
             .select('_id createdAt');
+
+        return groups.filter(group => group.group !== null);
     }
 
     async countMembersInGroup(groupId: string) {
         return await this.groupMemberModel.countDocuments({ group: groupId });
     }
 
-    async removeMember(group: any, member: any) {
+    async removeMember(group: any, memberId: any) {
         await this.groupMemberModel.findOneAndDelete({
-            user: member._id, group: group._id
+            user: memberId, group: group.id
         });
 
         return "Xóa thành viên thành công.";

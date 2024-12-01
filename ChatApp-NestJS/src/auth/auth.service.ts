@@ -43,7 +43,7 @@ export class AuthService {
         email: user.email,
         username: user.name,
         phone: user.phone,
-        avatar: user.imageId
+        avatar: user.imageUrl
       },
       access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
       refreshToken
