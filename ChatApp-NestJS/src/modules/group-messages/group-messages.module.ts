@@ -6,13 +6,17 @@ import { GroupMessage, GroupMessageSchema } from './schemas/group-message.schema
 import { MongooseModule } from '@nestjs/mongoose';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { GroupMembersModule } from '../group-members/group-members.module';
+import { UsersModule } from '../users/users.module';
+import { RealTimeModule } from '../real-time/real-time.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: GroupMessage.name, schema: GroupMessageSchema }]),
+    UsersModule,
     GroupsModule,
     GroupMembersModule,
-    CloudinaryModule
+    CloudinaryModule,
+    RealTimeModule
   ],
   controllers: [GroupMessagesController],
   providers: [GroupMessagesService],

@@ -28,7 +28,7 @@ export class AuthService {
 
   async signIn(user): Promise<any> {
     const payload = {
-      id: user._id.toString(), email: user.email, phone: user.phone, username: user.name
+      id: user._id.toString(), email: user.email, username: user.name, avatar: user.imageUrl
     };
     const refreshToken = this.jwtService.sign(payload,
       {

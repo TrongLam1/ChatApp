@@ -4,6 +4,7 @@ import { createContext } from "react";
 
 const defaultContactObject: IContactObject = {
     id: null,
+    channelId: null,
     name: null,
     avatar: null,
     isGroup: null,

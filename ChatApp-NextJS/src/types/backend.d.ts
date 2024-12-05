@@ -41,6 +41,7 @@ declare global {
 
     interface IContactObject {
         id: string | null;
+        channelId: string | null;
         name: string | null;
         avatar: string | null;
         isGroup: boolean | null,
@@ -55,5 +56,10 @@ declare global {
     interface IAddMembers {
         groupId: string;
         memberIds: string[];
+    }
+
+    interface ISendMessage {
+        id: string;
+        content: string;
     }
 }

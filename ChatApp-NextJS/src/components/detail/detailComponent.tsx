@@ -1,11 +1,12 @@
 'use client'
 
-import avatar from '@/assets/images/avatar.png';
+import avatarImg from '@/assets/images/avatar.png';
 import group from '@/assets/images/group.png';
 import { useContactObject } from '@/providers/contactObjectProvider';
 import { useTab } from '@/providers/tabProvider';
 import { faCircleDown, faCircleUp, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -21,22 +22,24 @@ export default function DetailComponent(props: any) {
     const { tab } = useTab();
     const { contactObject, setContactObject } = useContactObject();
 
+    const [avatar, setAvatar] = useState<any>();
     const [openModal, setOpenModal] = useState(false);
     const [isShowMembers, setIsShowMembers] = useState(false);
     const [membersOfGroup, setMembersOfGroup] = useState([]);
 
     useEffect(() => {
         setIsShowMembers(false);
-        if (contactObject?.isGroup) {
+        if (contactObject && contactObject?.isGroup) {
             getListMembersGroup();
         };
+        handleSetAvatar();
     }, [contactObject]);
 
     const handleSetAvatar = () => {
-        if (contactObject.isGroup) {
-            return group;
+        if (contactObject?.isGroup) {
+            setAvatar(group);
         } else {
-            return contactObject.avatar ?? avatar;
+            setAvatar(contactObject?.avatar ?? avatarImg);
         }
     };
 
@@ -73,7 +76,7 @@ export default function DetailComponent(props: any) {
                 {contactObject &&
                     <>
                         <div className='user'>
-                            <img src={handleSetAvatar()} alt='avatar' />
+                            <Image src={avatar} alt='avatar' />
                             <h3>{contactObject.name}</h3>
                         </div>
                         <div className='info'>
@@ -87,7 +90,7 @@ export default function DetailComponent(props: any) {
                                     <span>Privacy & help</span>
                                 </div>
                             </div>
-                            {tab === 'groups' &&
+                            {contactObject.isGroup &&
                                 <div className='option'>
                                     <div className='title'>
                                         <div className='members-container'>
@@ -115,7 +118,7 @@ export default function DetailComponent(props: any) {
                                     }
                                 </div>
                             }
-                            {tab === 'groups' &&
+                            {contactObject.isGroup &&
                                 <button type='button' onClick={handleQuitOutGroup}>Quit</button>
                             }
                         </div>

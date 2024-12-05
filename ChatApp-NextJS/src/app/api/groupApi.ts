@@ -1,4 +1,3 @@
-'use server'
 import { sendRequest } from "@/utils/api";
 
 export async function CreateGroup(token: string, body: ICreateGroup) {

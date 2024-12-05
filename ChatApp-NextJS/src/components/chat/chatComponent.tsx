@@ -1,29 +1,132 @@
 'use client'
 
-import { useEffect, useState } from "react";
-import avatar from '../../assets/images/avatar.png';
-import './chatComponent.scss';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleInfo, faImage, faPhone, faVideo } from "@fortawesome/free-solid-svg-icons";
-import Image from "next/image";
+import { ChannelGetMessages, ChannelSendMessage, GroupGetMessages, GroupSendMessage } from "@/app/api/messageApi";
+import avatar from '@/assets/images/avatar.png';
+import group from '@/assets/images/group.png';
 import { useContactObject } from "@/providers/contactObjectProvider";
-import { useTab } from "@/providers/tabProvider";
+import { faCircleInfo, faImage, faPhone, faVideo } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import MessageComponent from "../message/messageComponent";
+import './chatComponent.scss';
+import { io } from "socket.io-client";
+
+const socket = io('http://localhost:3001');
 
 export default function ChatComponent(props: any) {
 
-    const { tab } = useTab();
+    const { token, user } = props;
     const { contactObject } = useContactObject();
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState<boolean>(false);
 
-    const [message, setMessage] = useState('');
-    const [chatMessages, setChatMessages] = useState([]);
+    const [subscribe, setSubscribe] = useState<string>();
 
-    useEffect(() => { }, [contactObject]);
+    const [message, setMessage] = useState<any>();
+    const [chatMessages, setChatMessages] = useState<any>([]);
+    const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+    const [hasNewMessage, setHasNewMessage] = useState<boolean>(false);
 
-    const handleSendMessage = async () => { }
+    const messagesEndRef = useRef(null);
+    const containerRef = useRef(null);
 
-    const handleSubmitMessage = async (e) => { }
+    useEffect(() => {
+        if (contactObject) handleGetMessages();
+    }, [contactObject]);
+
+    useEffect(() => {
+        const container: any = containerRef.current;
+        container.addEventListener("scroll", handleScroll);
+        return () => {
+            container.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isAtBottom) {
+            scrollToBottom();
+        } else {
+            setHasNewMessage(true); // Hiện thông báo nếu không ở cuối
+        }
+    }, [chatMessages]);
+
+    useEffect(() => {
+        socket.emit('joinChat', subscribe);
+
+        socket.on('newMessage', (data) => {
+            setChatMessages((prev: any) => [...prev, data]);
+        });
+
+        return () => {
+            socket.off('newMessage');
+        };
+    }, [subscribe]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    const handleScroll = () => {
+        const container: any = containerRef.current;
+        if (container) {
+            const isBottom =
+                container.scrollHeight - container.scrollTop <= container.clientHeight + 10; // 10 là khoảng trừ nhỏ
+            setIsAtBottom(isBottom);
+            if (isBottom) {
+                setHasNewMessage(false); // Nếu cuộn xuống dưới, ẩn thông báo
+            }
+        }
+    };
+
+    const handleGetMessages = async () => {
+        if (contactObject.isGroup) {
+            const res = await GroupGetMessages(token, contactObject.id);
+            if (res.statusCode === 200) {
+                setChatMessages(res.data);
+                setSubscribe(contactObject.id);
+            }
+        } else {
+            const res = await ChannelGetMessages(token, contactObject.channelId);
+            if (res.statusCode === 200) {
+                setChatMessages(res.data);
+                setSubscribe(contactObject.channelId);
+            }
+        }
+    };
+
+    const handleChannelSendMessage = async () => {
+        const body = {
+            id: contactObject.channelId,
+            content: message
+        };
+
+        const res = await ChannelSendMessage(token, body);
+        if (res.statusCode === 201) {
+            setMessage('');
+        } else { toast.error(res.message); }
+    }
+
+    const handleGroupSendMessage = async () => {
+        const body = {
+            id: contactObject.id,
+            content: message
+        };
+
+        const res = await GroupSendMessage(token, body);
+        if (res.statusCode === 201) {
+            setMessage('');
+        } else { toast.error(res.message); }
+    }
+
+    const handleSubmitMessage = async () => {
+        if (contactObject.isGroup) {
+            await handleGroupSendMessage();
+        } else {
+            await handleChannelSendMessage();
+        }
+    }
 
     return (
         <>
@@ -32,10 +135,10 @@ export default function ChatComponent(props: any) {
                     <>
                         <div className='top'>
                             <div className='user'>
-                                <Image src={avatar} alt='avatar' />
+                                <Image src={contactObject.isGroup ? group : avatar} alt='avatar' />
                                 <div className='texts'>
                                     <span className='receiver'>{contactObject.name}</span>
-                                    {tab === 'groups' &&
+                                    {contactObject.isGroup &&
                                         <span>{contactObject.members} members</span>
                                     }
                                 </div>
@@ -47,14 +150,15 @@ export default function ChatComponent(props: any) {
                             </div>
                         </div>
 
-                        {/* <div className='center'>
+                        <div className='center'>
                             {chatMessages && chatMessages.length > 0 &&
-                                chatMessages.map((message, index) => {
-                                    return (<Message message={message} key={`message-${index}`} tab={tab} />)
+                                chatMessages.map((message: any, index: number) => {
+                                    return (<MessageComponent user={user}
+                                        message={message} key={`message-${index}`} />)
                                 })
                             }
                             <div ref={messagesEndRef} />
-                        </div> */}
+                        </div>
 
                         <div className='bottom'>
                             <div className='icons'>
@@ -62,10 +166,9 @@ export default function ChatComponent(props: any) {
                             </div>
                             <input type='text' placeholder='Type a message...' value={message}
                                 onChange={(e) => setMessage(e.target.value)}
-                                onKeyDown={(e) => handleSubmitMessage(e)}
                             />
                             <button className='send-button'
-                                onClick={handleSendMessage}
+                                onClick={handleSubmitMessage}
                             >
                                 Send
                             </button>

@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { ChannelsService } from '../channels/channels.service';
 import { ChannelMessageDto } from './dto/channel-message.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { RealTimeGateway } from '../real-time/real-time.gateway';
 
 @Injectable()
 export class ChannelMessagesService {
@@ -13,17 +14,29 @@ export class ChannelMessagesService {
     private readonly channelMessageModel: Model<ChannelMessage>,
     private readonly channelService: ChannelsService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly realTimeGateway: RealTimeGateway,
   ) { }
 
   async postMessage(req, @Body() channelMessageDto: ChannelMessageDto) {
-    const { friendId, content } = channelMessageDto;
-    const channel: any = await this.channelService.findChannel(req, friendId);
+    const { id, content } = channelMessageDto;
+    const channel: any = await this.channelService.findChannelById(id);
 
     const message: any = await this.channelMessageModel.create({
       channelId: channel._id,
       sender: req.user.userId,
       content: content
     });
+
+    this.realTimeGateway.handleSendMessage({
+      _id: message._id,
+      sender: {
+        _id: req.user.userId,
+        name: req.user.username,
+        imageUrl: req.user.avatar
+      },
+      content: message.content,
+      createdAt: message.createdAt,
+    }, channel._id.toString());
 
     return {
       sender: req.user.username,
@@ -36,8 +49,8 @@ export class ChannelMessagesService {
     req,
     @Body() channelMessageDto: ChannelMessageDto,
     file: Express.Multer.File) {
-    const { friendId } = channelMessageDto;
-    const channel: any = await this.channelService.findChannel(req, friendId);
+    const { id } = channelMessageDto;
+    const channel: any = await this.channelService.findChannelById(id);
 
     const files = await this.cloudinaryService.uploadFile(file);
 
@@ -53,5 +66,19 @@ export class ChannelMessagesService {
       content: message.imageUrl,
       createdAt: message.createdAt,
     };
+  }
+
+  async getMessages(channelId: string) {
+    const channel: any = await this.channelService.findChannelById(channelId);
+
+    const messages = await this.channelMessageModel
+      .find({ channelId: channel._id })
+      .populate({
+        path: 'sender',
+        select: 'name imageUrl'
+      })
+      .select('content createdAt');
+
+    return messages;
   }
 }

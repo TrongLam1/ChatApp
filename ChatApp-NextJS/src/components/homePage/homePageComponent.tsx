@@ -27,7 +27,7 @@ export default function HomePageComponent(props: any) {
             <ListFriendsComponent
                 user={user} token={token} listContacts={listContacts} countRequest={countRequest}
             />
-            <ChatComponent token={token} />
+            <ChatComponent token={token} user={user} />
             <DetailComponent token={token} user={user} />
         </div>
     );

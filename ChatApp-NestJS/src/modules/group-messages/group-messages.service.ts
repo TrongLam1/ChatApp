@@ -6,20 +6,24 @@ import { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { GroupMessageDto } from './dto/group-message.dto';
 import { GroupMembersService } from '../group-members/group-members.service';
+import { UsersService } from '../users/users.service';
+import { RealTimeGateway } from '../real-time/real-time.gateway';
 
 @Injectable()
 export class GroupMessagesService {
     constructor(
         @InjectModel(GroupMessage.name)
         private readonly groupMessageModel: Model<GroupMessage>,
+        private readonly userService: UsersService,
         private readonly groupService: GroupsService,
         private readonly groupMemberService: GroupMembersService,
         private readonly cloudinaryService: CloudinaryService,
+        private readonly realTimeGateway: RealTimeGateway,
     ) { }
 
     async postMessage(req, @Body() groupMessageDto: GroupMessageDto) {
-        const { groupId, content } = groupMessageDto;
-        const group: any = await this.groupService.findGroupById(groupId);
+        const { id, content } = groupMessageDto;
+        const group: any = await this.groupService.findById(id);
 
         await this.groupMemberService.checkedUserInGroup(req.user.userId, group);
 
@@ -29,8 +33,23 @@ export class GroupMessagesService {
             content: content
         });
 
+        this.realTimeGateway.handleSendMessage({
+            _id: message._id,
+            sender: {
+                _id: req.user.userId,
+                name: req.user.username,
+                imageUrl: req.user.avatar
+            },
+            content: message.content,
+            createdAt: message.createdAt,
+        }, id);
+
         return {
-            sender: req.user.username,
+            sender: {
+                _id: req.user.userId,
+                name: req.user.username,
+                imageUrl: req.user.avatar
+            },
             content: message.content,
             createdAt: message.createdAt,
         };
@@ -40,8 +59,9 @@ export class GroupMessagesService {
         req,
         @Body() groupMessageDto: GroupMessageDto,
         file: Express.Multer.File) {
-        const { groupId } = groupMessageDto;
-        const group: any = await this.groupService.findGroupById(groupId);
+        const { id } = groupMessageDto;
+        const group: any = await this.groupService.findById(id);
+        const sender = await this.userService.findOneById(req.user.userId);
 
         await this.groupMemberService.checkedUserInGroup(req.user.userId, group);
 
@@ -55,9 +75,24 @@ export class GroupMessagesService {
         });
 
         return {
-            sender: req.user.username,
+            sender: {
+                name: sender.name,
+                avatar: sender.imageUrl
+            },
             content: message.imageUrl,
             createdAt: message.createdAt,
         };
+    }
+
+    async getMessages(groupId: string) {
+        const group = await this.groupService.findById(groupId);
+
+        return await this.groupMessageModel
+            .find({ group: group._id })
+            .populate({
+                path: 'sender',
+                select: 'name imageUrl'
+            })
+            .select('content imageUrl createdAt');
     }
 }

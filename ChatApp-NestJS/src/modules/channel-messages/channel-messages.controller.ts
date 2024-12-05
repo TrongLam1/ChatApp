@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ChannelMessagesService } from './channel-messages.service';
 import { ChannelMessageDto } from './dto/channel-message.dto';
@@ -14,7 +14,7 @@ export class ChannelMessagesController {
     return await this.channelMessagesService.postMessage(req, channelMessageDto);
   }
 
-  @Post('post-message')
+  @Post('post-image')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async postImage(
@@ -22,5 +22,11 @@ export class ChannelMessagesController {
     @Body() channelMessageDto: ChannelMessageDto,
     @UploadedFile() file: Express.Multer.File) {
     return await this.channelMessagesService.postImage(req, channelMessageDto, file);
+  }
+
+  @Get('get-messages/:channelId')
+  @UseGuards(JwtAuthGuard)
+  async getMessages(@Param('channelId') channelId: string) {
+    return await this.channelMessagesService.getMessages(channelId);
   }
 }

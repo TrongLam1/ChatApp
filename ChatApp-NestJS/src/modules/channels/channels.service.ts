@@ -37,7 +37,7 @@ export class ChannelsService {
     if (!channel) {
       channel = await this.channelModel
         .findOne({
-          friendId, userId: req.user.userId
+          friendId: req.user.userId, userId: friendId
         })
         .populate({
           path: 'friendId',
@@ -45,17 +45,16 @@ export class ChannelsService {
         });
 
       if (!channel) {
-        return await this.createNewChannel(req, friendId);
+        channel = await this.createNewChannel(req, friendId);
       }
     }
 
     return {
-      channelId: channel._id,
-      friend: {
-        friendId: channel.friendId._id,
-        name: channel.friendId.name,
-        avatar: channel.friendId.imageUrl
-      },
+      channelId: channel._id
     };
+  }
+
+  async findChannelById(channelId: string) {
+    return await this.channelModel.findOne({ _id: channelId });
   }
 }

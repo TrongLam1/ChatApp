@@ -16,7 +16,7 @@ export class GroupsService {
     private readonly groupMemberService: GroupMembersService,
   ) { }
 
-  private async findById(groupId: string) {
+  async findById(groupId: string) {
     const group = await this.groupModel
       .findOne({
         _id: groupId, isAvailable: true

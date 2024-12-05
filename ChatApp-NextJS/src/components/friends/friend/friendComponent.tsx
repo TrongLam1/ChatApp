@@ -1,14 +1,14 @@
 'use client'
 
 import { FindChannel } from "@/app/api/channelApi";
+import { FindGroupById } from "@/app/api/groupApi";
+import group from '@/assets/images/group.png';
 import { useContactObject } from '@/providers/contactObjectProvider';
 import { useTab } from '@/providers/tabProvider';
 import Image from "next/image";
 import { toast } from 'react-toastify';
-import avatar from '../../../assets/images/avatar.png';
-import group from '@/assets/images/group.png';
+import avatar from '@/assets/images/avatar.png';
 import './friendComponent.scss';
-import { FindGroupById } from "@/app/api/groupApi";
 
 export default function FriendComponent(props: any) {
 
@@ -17,17 +17,19 @@ export default function FriendComponent(props: any) {
     const { tab } = useTab();
     const { setContactObject } = useContactObject();
 
-    const handleSubscribeChannel = async (friendId: string) => {
-        const res = await FindChannel(token, friendId);
+    const handleSubscribeChannel = async () => {
+        const res = await FindChannel(token, contact.id);
         if (res.statusCode === 200) {
-            setContactObject(res.data.friend);
-        } else {
-            toast.error(res.message);
-        }
+            setContactObject({
+                id: contact.id,
+                name: contact.name,
+                channelId: res.data.channelId
+            });
+        } else { toast.error(res.message); }
     };
 
-    const handleSubscribeGroup = async (groupId: string) => {
-        const res = await FindGroupById(token, groupId);
+    const handleSubscribeGroup = async () => {
+        const res = await FindGroupById(token, contact.id);
         if (res.statusCode === 200) {
             setContactObject({
                 id: res.data.group.id,
@@ -39,6 +41,14 @@ export default function FriendComponent(props: any) {
             toast.error(res.message);
         }
     };
+
+    const handleSubscribe = async () => {
+        if (tab === 'groups') {
+            handleSubscribeGroup();
+        } else {
+            handleSubscribeChannel();
+        }
+    }
 
     const formatTime = () => {
         if (contact?.lastMessage?.createAt !== undefined) {
@@ -57,11 +67,10 @@ export default function FriendComponent(props: any) {
     };
 
     return (
-        <div className='friend'
-            onClick={() => { tab === 'friends' ? handleSubscribeChannel(contact.id) : handleSubscribeGroup(contact.id) }}>
+        <div className='friend' onClick={handleSubscribe}>
             {contact.isGroup ?
                 <Image src={group} alt='' width={50} height={50} /> :
-                <Image src={contact?.avatar ? contact?.avatar : avatar} alt=''
+                <Image src={contact.avatar !== null ? contact.avatar : avatar} alt=''
                     width={50} height={50} />}
             <div className='texts'>
                 <div className='info'>
