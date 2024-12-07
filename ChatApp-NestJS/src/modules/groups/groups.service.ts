@@ -28,7 +28,7 @@ export class GroupsService {
 
   async createGroup(req, @Body() groupDto: GroupDto) {
     const { groupName, memberIds } = groupDto;
-    const admin = await this.userService.findOneById(req.user.userId);
+    const admin = await this.userService.findOneById(req.user._id);
 
     const group = await this.groupModel.create({
       groupName: groupName, admin: admin._id
@@ -61,7 +61,7 @@ export class GroupsService {
 
   async addMember(req, @Body() addMembersDto: AddMembersDto) {
     const { groupId, memberIds } = addMembersDto;
-    const user: any = await this.userService.findOneById(req.user.userId);
+    const user: any = await this.userService.findOneById(req.user._id);
 
     const group = await this.findById(groupId);
 
@@ -70,26 +70,26 @@ export class GroupsService {
   }
 
   async getListMembersGroup(req, groupId: string) {
-    const user: any = await this.userService.findOneById(req.user.userId);
+    const user: any = await this.userService.findOneById(req.user._id);
     const group = await this.findById(groupId);
 
     return await this.groupMemberService.getListMembersGroup(user, group);
   }
 
   async getListFriendsInvite(req, groupId: string) {
-    const user: any = await this.userService.findOneById(req.user.userId);
+    const user: any = await this.userService.findOneById(req.user._id);
     const group = await this.findById(groupId);
 
     return await this.groupMemberService.getListFriendsInvite(req, user, group);
   }
 
   async getListGroupsByUser(req) {
-    const user: any = await this.userService.findOneById(req.user.userId);
+    const user: any = await this.userService.findOneById(req.user._id);
     return await this.groupMemberService.getListGroupsByUser(user._id);
   }
 
   async removeMember(req, groupId: string, memberId: string) {
-    const user: any = await this.userService.findOneById(req.user.userId);
+    const user: any = await this.userService.findOneById(req.user._id);
 
     const group = await this.groupModel.findOne({
       _id: groupId, isAvailable: true
@@ -105,7 +105,7 @@ export class GroupsService {
   }
 
   async quitGroup(req, groupId: string) {
-    const user: any = await this.userService.findOneById(req.user.userId);
+    const user: any = await this.userService.findOneById(req.user._id);
     const group: any = await this.findGroupById(groupId);
 
     if (group.group.admin.toString() === user._id.toString()) {

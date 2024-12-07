@@ -27,7 +27,7 @@ export class GroupMembersService {
             user: memberId, group: group._id
         });
 
-        if (!isExisted) throw new BadRequestException("Bạn không ở trong nhóm này.");
+        if (isExisted === null) throw new BadRequestException("Bạn không ở trong nhóm này.");
 
         return true;
     }

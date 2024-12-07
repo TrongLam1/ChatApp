@@ -89,7 +89,7 @@ export class UsersService {
 
   async getProfile(req: any) {
     return await this.userModel
-      .findById({ _id: req.user.userId })
+      .findById({ _id: req.user._id })
       .select('name email phone imageUrl');
   }
 
@@ -110,7 +110,7 @@ export class UsersService {
     if (phone) updateFields.phone = phone;
 
     const user = await this.userModel.findByIdAndUpdate(
-      req.user.userId,
+      req.user._id,
       updateFields,
       { new: true, runValidators: true }
     );
@@ -128,7 +128,7 @@ export class UsersService {
   async changeAvatar(req, file: Express.Multer.File) {
     const files = await this.cloudinaryService.uploadFile(file);
     const user = await this.userModel.findByIdAndUpdate(
-      { _id: req.user.userId },
+      { _id: req.user._id },
       {
         imageId: files.public_id,
         imageUrl: files.url

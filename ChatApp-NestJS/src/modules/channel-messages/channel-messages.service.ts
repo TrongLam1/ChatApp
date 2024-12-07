@@ -23,20 +23,30 @@ export class ChannelMessagesService {
 
     const message: any = await this.channelMessageModel.create({
       channelId: channel._id,
-      sender: req.user.userId,
+      sender: req.user._id,
       content: content
     });
 
     this.realTimeGateway.handleSendMessage({
       _id: message._id,
       sender: {
-        _id: req.user.userId,
+        _id: req.user._id,
         name: req.user.username,
         imageUrl: req.user.avatar
       },
+      subscribeId: channel._id,
       content: message.content,
       createdAt: message.createdAt,
     }, channel._id.toString());
+
+    const sendTo = channel.userId._id.toString() === req.user._id ?
+      channel.friendId._id.toString() : channel.userId._id.toString();
+
+    this.realTimeGateway.handleSendNotification({
+      type: 'New message',
+      subscribe: channel._id.toString(),
+      messageFrom: req.user.username
+    }, sendTo);
 
     return {
       sender: req.user.username,
@@ -56,7 +66,7 @@ export class ChannelMessagesService {
 
     const message: any = await this.channelMessageModel.create({
       channelId: channel._id,
-      sender: req.user.userId,
+      sender: req.user._id,
       imageId: files.public_id,
       imageUrl: files.url,
     });

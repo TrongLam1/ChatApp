@@ -17,17 +17,17 @@ export class ChannelsService {
     if (!isFriend) throw new BadRequestException("Chưa kết bạn, không thể nhắn tin.");
 
     const channel = await this.channelModel.create(
-      { userId: req.user.userId, friendId: friendId });
+      { userId: req.user._id, friendId: friendId });
 
     return channel;
   }
 
   async findChannel(req, friendId: string) {
-    if (req.user.userId === friendId) throw new BadRequestException("Người nhận không hợp lệ.");
+    if (req.user._id === friendId) throw new BadRequestException("Người nhận không hợp lệ.");
 
     let channel: any = await this.channelModel
       .findOne({
-        userId: req.user.userId, friendId
+        userId: req.user._id, friendId
       })
       .populate({
         path: 'friendId',
@@ -37,7 +37,7 @@ export class ChannelsService {
     if (!channel) {
       channel = await this.channelModel
         .findOne({
-          friendId: req.user.userId, userId: friendId
+          friendId: req.user._id, userId: friendId
         })
         .populate({
           path: 'friendId',
@@ -55,6 +55,15 @@ export class ChannelsService {
   }
 
   async findChannelById(channelId: string) {
-    return await this.channelModel.findOne({ _id: channelId });
+    return await this.channelModel
+      .findOne({ _id: channelId })
+      .populate({
+        path: 'userId',
+        select: '_id',
+      })
+      .populate({
+        path: 'friendId',
+        select: '_id',
+      });
   }
 }

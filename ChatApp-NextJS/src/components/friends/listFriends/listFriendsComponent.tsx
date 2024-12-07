@@ -16,14 +16,13 @@ import { FindUsersByName } from "@/app/api/friendshipApi";
 export default function ListFriendsComponent(props: any) {
     const router = useRouter();
 
-    const { user, token, listContacts, countRequest } = props;
+    const { user, token, listContacts, countRequest, setCount } = props;
 
     const { tab, setTab } = useTab();
 
     const [username, setUsername] = useState('');
     const [openModalUserInfo, setOpenModalUserInfo] = useState(false);
     const [openModalCreateGroup, setOpenModalCreateGroup] = useState(false);
-    const [amountAddFriend, setAmountAddFriend] = useState(countRequest);
     const [listFriends, setListFriends] = useState(listContacts);
 
     useEffect(() => {
@@ -85,7 +84,7 @@ export default function ListFriendsComponent(props: any) {
                 <div className='amount-add-friend'>
                     <button className={`${tab === 'accepts' ? 'active' : ''}`}
                         onClick={() => handleNavigateTab('accepts')}>Accepts</button>
-                    <div className='amount'>{amountAddFriend}</div>
+                    <div className='amount'>{countRequest}</div>
                 </div>
             </div>
             <div className='list-chats'>
@@ -102,7 +101,8 @@ export default function ListFriendsComponent(props: any) {
                         }
 
                         return tab === 'accepts' ?
-                            (<WaitingAcceptComponent contact={item} key={`friend-${index}`} token={token}
+                            (<WaitingAcceptComponent contact={item} key={`friend-${index}`}
+                                token={token} countRequest={countRequest} setCount={setCount}
                             />)
                             :
                             (<FriendComponent contact={contact} key={`friend-${index}`}

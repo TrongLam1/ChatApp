@@ -126,7 +126,7 @@ const Detail = (props) => {
             </div>
             <InviteUsers open={openModal} setOpen={setOpenModal} groupId={chatWith} />
         </>
-    )
+    );
 };
 
 export default Detail;

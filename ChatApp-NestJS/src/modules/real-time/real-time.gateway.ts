@@ -15,7 +15,19 @@ export class RealTimeGateway {
         client.join(subscribeId);
     }
 
+    @SubscribeMessage('joinNotification')
+    handleJoinNotification(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() userId: string
+    ) {
+        client.join(userId);
+    }
+
     handleSendMessage(newMessage: any, subscribeId: string) {
         this.server.to(subscribeId).emit('newMessage', newMessage);
+    }
+
+    handleSendNotification(notification: any, userId: string) {
+        this.server.to(userId).emit('notification', notification);
     }
 }

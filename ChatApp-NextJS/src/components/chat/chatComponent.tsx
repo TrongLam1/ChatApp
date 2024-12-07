@@ -26,37 +26,24 @@ export default function ChatComponent(props: any) {
 
     const [message, setMessage] = useState<any>();
     const [chatMessages, setChatMessages] = useState<any>([]);
-    const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
-    const [hasNewMessage, setHasNewMessage] = useState<boolean>(false);
 
     const messagesEndRef = useRef(null);
-    const containerRef = useRef(null);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [chatMessages]);
 
     useEffect(() => {
         if (contactObject) handleGetMessages();
     }, [contactObject]);
 
     useEffect(() => {
-        const container: any = containerRef.current;
-        container.addEventListener("scroll", handleScroll);
-        return () => {
-            container.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (isAtBottom) {
-            scrollToBottom();
-        } else {
-            setHasNewMessage(true); // Hiện thông báo nếu không ở cuối
-        }
-    }, [chatMessages]);
-
-    useEffect(() => {
         socket.emit('joinChat', subscribe);
 
-        socket.on('newMessage', (data) => {
-            setChatMessages((prev: any) => [...prev, data]);
+        socket.on('newMessage', (message) => {
+            if (message.subscribeId === subscribe) {
+                setChatMessages((prev: any) => [...prev, message]);
+            }
         });
 
         return () => {
@@ -66,18 +53,6 @@ export default function ChatComponent(props: any) {
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
-    const handleScroll = () => {
-        const container: any = containerRef.current;
-        if (container) {
-            const isBottom =
-                container.scrollHeight - container.scrollTop <= container.clientHeight + 10; // 10 là khoảng trừ nhỏ
-            setIsAtBottom(isBottom);
-            if (isBottom) {
-                setHasNewMessage(false); // Nếu cuộn xuống dưới, ẩn thông báo
-            }
-        }
     };
 
     const handleGetMessages = async () => {

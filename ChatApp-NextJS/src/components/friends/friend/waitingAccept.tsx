@@ -1,29 +1,42 @@
 'use client'
 
-import { AcceptFriend } from '@/app/api/friendshipApi';
+import { AcceptFriend, CancelFriend } from '@/app/api/friendshipApi';
 import avatar from '@/assets/images/avatar.png';
 import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 export default function WaitingAcceptComponent(props: any) {
-    const { contact, token } = props;
+    const { contact, token, setCount, countRequest } = props;
 
-    const [user, setUser] = useState<any>(contact.friendId);
+    const [user, setUser] = useState<any>();
+
+    useEffect(() => {
+        if (contact?.status === 'pending') setUser(contact?.friendId);
+    }, [contact]);
 
     const handleAcceptFriend = async (friendId: string) => {
         const res = await AcceptFriend(token, { friendId });
         if (res.statusCode === 200) {
-            toast.success("Add friend successfully.");
+            toast.success("Đồng ý kết bạn thành công.");
             setUser(null);
+            setCount(countRequest > 0 ? countRequest - 1 : 0);
         } else {
             toast.error(res.message);
         }
     };
 
-    const handleDenyAcceptFriend = async () => {
-
+    const handleDenyAcceptFriend = async (friendId: string) => {
+        const res = await CancelFriend(token, { friendId });
+        if (res.statusCode === 200) {
+            toast.success("Đã hủy kết bạn.");
+            setUser(null);
+            setCount(countRequest > 0 ? countRequest - 1 : 0);
+        } else {
+            toast.error(res.message);
+        }
     };
 
     return (
@@ -31,7 +44,8 @@ export default function WaitingAcceptComponent(props: any) {
             {user &&
                 <div className='friend'>
                     <div className='accept-info'>
-                        <img src={user?.avatar ? user?.avatar : avatar} alt='' />
+                        <Image src={user?.avatar ? user?.avatar : avatar}
+                            width={50} height={50} alt='' />
                         <div className='texts'>
                             <span>{user?.name}</span>
                         </div>
@@ -42,7 +56,7 @@ export default function WaitingAcceptComponent(props: any) {
                             <FontAwesomeIcon icon={faCircleCheck} />
                         </button>
                         <button type='button' className='deny'
-                            onClick={() => handleDenyAcceptFriend()}>
+                            onClick={() => handleDenyAcceptFriend(user._id)}>
                             <FontAwesomeIcon icon={faCircleXmark} />
                         </button>
                     </div>

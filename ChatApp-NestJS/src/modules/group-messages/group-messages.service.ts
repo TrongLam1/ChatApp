@@ -25,28 +25,41 @@ export class GroupMessagesService {
         const { id, content } = groupMessageDto;
         const group: any = await this.groupService.findById(id);
 
-        await this.groupMemberService.checkedUserInGroup(req.user.userId, group);
+        await this.groupMemberService.checkedUserInGroup(req.user._id, group);
 
         const message: any = await this.groupMessageModel.create({
             group: group._id,
-            sender: req.user.userId,
+            sender: req.user._id,
             content: content
         });
+
+        const members = await this.groupMemberService.getListMembersGroup(req.user, group);
 
         this.realTimeGateway.handleSendMessage({
             _id: message._id,
             sender: {
-                _id: req.user.userId,
+                _id: req.user._id,
                 name: req.user.username,
                 imageUrl: req.user.avatar
             },
+            subscribeId: group._id,
             content: message.content,
             createdAt: message.createdAt,
         }, id);
 
+        members
+            .filter(member => member.friendId._id.toString() !== req.user._id)
+            .map(member => {
+                this.realTimeGateway.handleSendNotification({
+                    type: 'New message',
+                    subscribe: group._id.toString(),
+                    messageFrom: `Nhóm '${group.groupName}'`
+                }, member.friendId._id.toString());
+            })
+
         return {
             sender: {
-                _id: req.user.userId,
+                _id: req.user._id,
                 name: req.user.username,
                 imageUrl: req.user.avatar
             },
@@ -61,15 +74,15 @@ export class GroupMessagesService {
         file: Express.Multer.File) {
         const { id } = groupMessageDto;
         const group: any = await this.groupService.findById(id);
-        const sender = await this.userService.findOneById(req.user.userId);
+        const sender = await this.userService.findOneById(req.user._id);
 
-        await this.groupMemberService.checkedUserInGroup(req.user.userId, group);
+        await this.groupMemberService.checkedUserInGroup(req.user._id, group);
 
         const files = await this.cloudinaryService.uploadFile(file);
 
         const message: any = await this.groupMessageModel.create({
             group: group._id,
-            sender: req.user.userId,
+            sender: req.user._id,
             imageId: files.public_id,
             imageUrl: files.url,
         });

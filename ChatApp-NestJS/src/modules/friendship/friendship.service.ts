@@ -3,13 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersService } from '../users/users.service';
 import { Friendship, StatusFriendship } from './schemas/friendship.schema';
+import { RealTimeGateway } from '../real-time/real-time.gateway';
 
 @Injectable()
 export class FriendshipService {
   constructor(
     @InjectModel(Friendship.name)
     private readonly friendshipModel: Model<Friendship>,
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
+    private readonly realTimeGateway: RealTimeGateway,
   ) { }
 
   private async existedFriendship(user, friend) {
@@ -23,7 +25,7 @@ export class FriendshipService {
   }
 
   async requestFriend(req, userId: string) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     const friend = await this.userService.findOneById(userId);
 
     await this.existedFriendship(user, friend);
@@ -40,11 +42,16 @@ export class FriendshipService {
       status: StatusFriendship.PENDING
     });
 
+    this.realTimeGateway.handleSendNotification({
+      type: 'Request friend',
+      messageFrom: req.user.username
+    }, friend._id.toString());
+
     return friendshipMe;
   }
 
   async acceptFriend(req, userId: string) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     const friend = await this.userService.findOneById(userId);
 
     const friendshipMe = await this.friendshipModel
@@ -71,11 +78,15 @@ export class FriendshipService {
         { new: true }
       );
 
-    return friendshipMe;
+    const countRequest = await this.countRequestFriends(req);
+
+    return {
+      friend: friendshipMe, countRequest
+    };
   }
 
   async cancelFriendship(req, _userId: string) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     const friend = await this.userService.findOneById(_userId);
 
     await this.friendshipModel
@@ -94,11 +105,11 @@ export class FriendshipService {
         }
       );
 
-    return "Hủy kết bạn thành công.";
+    return await this.countRequestFriends(req);
   }
 
   async isFriend(req, friendId: string) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     const friend = await this.userService.findOneById(friendId);
 
     const friendship = await this.friendshipModel.findOne({
@@ -112,7 +123,7 @@ export class FriendshipService {
   }
 
   async findFriend(req, friendId: string) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     return await this.friendshipModel
       .findOne({
         userId: user._id,
@@ -128,7 +139,7 @@ export class FriendshipService {
   }
 
   async getListFriends(req) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     return await this.friendshipModel
       .find({
         friendId: user._id,
@@ -143,7 +154,7 @@ export class FriendshipService {
   }
 
   async getListRequestFriends(req) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     return await this.friendshipModel
       .find({
         userId: user._id,
@@ -158,16 +169,16 @@ export class FriendshipService {
   }
 
   async countRequestFriends(req) {
-    const user = await this.userService.findOneById(req.user.userId);
+    const user = await this.userService.findOneById(req.user._id);
     return await this.friendshipModel
       .countDocuments({
-        friendId: user._id,
+        userId: user._id,
         status: StatusFriendship.PENDING,
       });
   }
 
   async findUsersByName(req, name: string) {
-    const me = await this.userService.findOneById(req.user.userId);
+    const me = await this.userService.findOneById(req.user._id);
     const users = await this.userService.findUsersByName(name);
 
     const usersMap = new Map(
@@ -177,7 +188,7 @@ export class FriendshipService {
     );
 
     const userIds: any = users
-      .filter(user => user._id.toString() !== req.user.userId)
+      .filter(user => user._id.toString() !== req.user._id)
       .map(user => user._id);
 
     return await this.findFriendshipsByUserIds(me, userIds, usersMap);
