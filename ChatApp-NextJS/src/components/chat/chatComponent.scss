@@ -21,11 +21,15 @@
             gap: 20px;
             flex-direction: row;
 
-            img {
+            .avatar {
                 width: 60px;
                 height: 60px;
-                border-radius: 50%;
-                object-fit: cover;
+                position: relative;
+
+                img {
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
             }
 
             .texts {
@@ -94,11 +98,15 @@
                 }
             }
 
-            img {
+            .avatar {
                 width: 30px;
                 height: 30px;
-                border-radius: 50%;
-                object-fit: cover;
+                position: relative;
+
+                img {
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
             }
 
             .texts {
@@ -111,13 +119,17 @@
                     font-size: .8rem;
                 }
 
-                img {
+                .image-container {
                     width: 100%;
                     height: 250px;
-                    padding: 5px;
-                    border-radius: 10px;
-                    object-fit: cover;
-                    background-color: rgba(17, 25, 40, .3);
+                    position: relative;
+
+                    img {
+                        padding: 5px;
+                        border-radius: 10px;
+                        object-fit: cover;
+                        background-color: rgba(17, 25, 40, .3);
+                    }
                 }
 
                 p {

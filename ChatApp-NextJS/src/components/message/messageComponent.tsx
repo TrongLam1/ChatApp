@@ -17,11 +17,13 @@ export default function MessageComponent(props: any) {
     const convertDate = (isoString: string) => {
         const date = new Date(isoString);
 
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const year = String(date.getUTCFullYear()).slice(-2);
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const localDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+
+        const day = String(localDate.getUTCDate()).padStart(2, '0');
+        const month = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+        const year = String(localDate.getUTCFullYear()).slice(-2);
+        const hours = String(localDate.getUTCHours()).padStart(2, '0');
+        const minutes = String(localDate.getUTCMinutes()).padStart(2, '0');
 
         return `${day}-${month}-${year}, ${hours}:${minutes}`;
     };
@@ -29,12 +31,16 @@ export default function MessageComponent(props: any) {
     return (
         <div className={`message ${message.sender.name === user.username ? 'own' : 'friend-mess'}`}>
             {user.username !== message.sender.name &&
-                <Image src={contactObject?.avatar ? contactObject.avatar : avatar} alt=''
-                    width={50} height={50} />}
+                <div className='avatar'>
+                    <Image src={contactObject?.avatar ? contactObject.avatar : avatar} fill alt='avatar' />
+                </div>}
             <div className='texts'>
                 {contactObject.isGroup && user.username !== message.sender.name &&
                     <div className='text-sender'>{message.sender.name}</div>}
-                {message.imageUrl && <img src={message.sender.imageUrl} alt='img' />}
+                {message.imageUrl &&
+                    <div className='image-container'>
+                        <img src={message.sender.imageUrl} alt='img' />
+                    </div>}
                 {message.content && <p>{message.content}</p>}
                 <span>{convertDate(message.createdAt)}</span>
             </div>

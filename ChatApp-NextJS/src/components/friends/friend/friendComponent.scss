@@ -7,10 +7,18 @@
     border-bottom: 1px solid #dddddd35;
     height: 80px;
 
-    img {
+    .image-container {
+        position: relative;
+        height: 50px;
+        width: 50px;
         border-radius: 50%;
-        object-fit: cover;
         border: 1px solid white;
+        background-color: transparent;
+
+        img {
+            object-fit: cover;
+            border-radius: 50%;
+        }
     }
 
     .accept-info {

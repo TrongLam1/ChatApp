@@ -60,6 +60,6 @@ declare global {
 
     interface ISendMessage {
         id: string;
-        content: string;
+        content: string | null;
     }
 }

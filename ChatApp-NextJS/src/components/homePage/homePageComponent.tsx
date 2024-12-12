@@ -39,8 +39,20 @@ export default function HomePageComponent(props: any) {
                 if (notify.type === 'Request friend') {
                     toast.info('Bạn có lời mời kết bạn.');
                     setCount(count + 1);
-                } else if (!contactObject || notify.subscribe !== contactObject?.channelId) {
+                    return;
+                };
+
+                if (!contactObject) {
                     toast.success(<p>Tin nhắn mới từ: <br /> <strong>{notify.messageFrom}</strong></p>);
+                    return;
+                };
+
+                if (!contactObject.isGroup) {
+                    if (notify.subscribe !== contactObject?.channelId) {
+                        toast.success(<p>Tin nhắn mới từ: <br /> <strong>{notify.messageFrom}</strong></p>);
+                    } else if (notify.subscribe !== contactObject?.id) {
+                        toast.success(<p>Tin nhắn mới từ: <br /> <strong>{notify.messageFrom}</strong></p>);
+                    }
                 }
             });
 

@@ -97,6 +97,20 @@
     }
 
     .list-chats {
+        .refresh {
+            display: flex;
+            justify-content: flex-end;
+            margin: .5rem .8rem;
+
+            svg {
+                font-size: 1.2rem;
+            }
+
+            &:hover {
+                color: greenyellow;
+                cursor: pointer;
+            }
+        }
 
         .no-content {
             color: white;

@@ -10,8 +10,12 @@ import Image from 'next/image';
 import { useState } from 'react';
 import './memberComponent.scss';
 import { toast } from 'react-toastify';
+import { useSession } from 'next-auth/react';
+import { RequestFriend } from '@/app/api/friendshipApi';
 
 export default function MemberComponent(props: any) {
+    const { data: session } = useSession();
+
     const { member, token, updateInfoGroup, setMembersOfGroup } = props;
     const { contactObject, setContactObject } = useContactObject();
 
@@ -31,7 +35,10 @@ export default function MemberComponent(props: any) {
     };
 
     const handleRequestFriend = async (userId: string) => {
-
+        const res = await RequestFriend(token, { friendId: userId });
+        if (res.statusCode === 201) {
+            setStatus(res.data.status);
+        };
     };
 
     const handleRemoveMember = async () => {
@@ -56,15 +63,18 @@ export default function MemberComponent(props: any) {
         <>
             <div className='member-group'>
                 <div className='info'>
-                    <Image src={user?.avatar ? user?.avatar : avatar} alt='' />
+                    <div className="avatar">
+                        <Image src={user?.imageUrl ? user?.imageUrl : avatar} fill alt='' />
+                    </div>
                     <span>{user?.name}</span>
                 </div>
                 <div className='action'>
-                    <FontAwesomeIcon icon={faCircleXmark} className='remove-member'
-                        onClick={confirmModal} />
+                    {session?.user.user.id !== user?._id &&
+                        <FontAwesomeIcon icon={faCircleXmark} className='remove-member'
+                            onClick={confirmModal} />}
                     {status === null &&
                         <FontAwesomeIcon icon={faUserPlus} className='request-friend'
-                            onClick={() => handleRequestFriend(user._id)} />}
+                            onClick={() => handleRequestFriend(user?._id)} />}
                 </div>
             </div>
             <ConfirmModal isOpen={isOpen} closeModal={closeModal} message={message}

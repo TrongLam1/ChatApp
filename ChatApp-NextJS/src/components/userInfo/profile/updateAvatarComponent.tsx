@@ -6,8 +6,11 @@ import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function UpdateAvatarComponent(props: any) {
+    const router = useRouter();
     const { update } = useSession();
 
     const { setIsUpdateAvatar, user, token } = props;
@@ -39,6 +42,8 @@ export default function UpdateAvatarComponent(props: any) {
         };
 
         setLoadingApi(false);
+        setIsUpdateAvatar(false);
+        router.refresh();
     };
 
     return (
@@ -50,7 +55,7 @@ export default function UpdateAvatarComponent(props: any) {
             <div className='user-info-body'>
                 <div className='avatar-user-container'>
                     <div className='avatar'>
-                        <img src={preview} alt='' />
+                        <Image src={preview} fill alt='' />
                     </div>
                     <div className='btn-change-avatar-modal'>
                         <label htmlFor='avatar-preview' >

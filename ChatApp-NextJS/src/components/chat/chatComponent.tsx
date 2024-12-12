@@ -1,7 +1,7 @@
 'use client'
 
 import { ChannelGetMessages, ChannelSendMessage, GroupGetMessages, GroupSendMessage } from "@/app/api/messageApi";
-import avatar from '@/assets/images/avatar.png';
+import avatarDefault from '@/assets/images/avatar.png';
 import group from '@/assets/images/group.png';
 import { useContactObject } from "@/providers/contactObjectProvider";
 import { faCircleInfo, faImage, faPhone, faVideo } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import MessageComponent from "../message/messageComponent";
 import './chatComponent.scss';
 import { io } from "socket.io-client";
+import UploadImageModal from "../modal/uploadImage/uploadImageModal";
 
 const socket = io('http://localhost:3001');
 
@@ -20,10 +21,9 @@ export default function ChatComponent(props: any) {
     const { token, user } = props;
     const { contactObject } = useContactObject();
 
+    const [avatar, setAvatar] = useState<any>();
     const [open, setOpen] = useState<boolean>(false);
-
     const [subscribe, setSubscribe] = useState<string>();
-
     const [message, setMessage] = useState<any>();
     const [chatMessages, setChatMessages] = useState<any>([]);
 
@@ -34,7 +34,14 @@ export default function ChatComponent(props: any) {
     }, [chatMessages]);
 
     useEffect(() => {
-        if (contactObject) handleGetMessages();
+        if (contactObject) {
+            handleGetMessages();
+            if (contactObject.isGroup) {
+                setAvatar(group);
+            } else {
+                setAvatar(contactObject.avatar ? contactObject.avatar : avatarDefault);
+            }
+        }
     }, [contactObject]);
 
     useEffect(() => {
@@ -110,7 +117,9 @@ export default function ChatComponent(props: any) {
                     <>
                         <div className='top'>
                             <div className='user'>
-                                <Image src={contactObject.isGroup ? group : avatar} alt='avatar' />
+                                <div className="avatar">
+                                    <Image src={contactObject.isGroup ? group : avatar} fill alt='avatar' />
+                                </div>
                                 <div className='texts'>
                                     <span className='receiver'>{contactObject.name}</span>
                                     {contactObject.isGroup &&
@@ -151,11 +160,7 @@ export default function ChatComponent(props: any) {
                     </>
                 }
             </div>
-            {/* <UploadImage open={open} setOpen={setOpen}
-                subscribe={subscribe}
-                handleGetMessage={handleGetMessage}
-                tab={tab}
-            /> */}
+            {open && <UploadImageModal setOpen={setOpen} token={token} />}
         </>
     );
 } 

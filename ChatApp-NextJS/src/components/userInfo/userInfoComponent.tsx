@@ -21,8 +21,7 @@ export default function UserInfoComponent(props: any) {
             <div className='user-info-container'>
                 <div className='user'>
                     <div className='avatar'>
-                        <Image src={user?.avatar ? user?.avatar : avatar} alt='avatar'
-                            width={50} height={50} />
+                        <Image src={user?.avatar ? user?.avatar : avatar} fill alt='avatar' />
                     </div>
                     <h5>{user?.username}</h5>
                 </div>

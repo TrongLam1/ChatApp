@@ -71,6 +71,27 @@ export class ChannelMessagesService {
       imageUrl: files.url,
     });
 
+    this.realTimeGateway.handleSendMessage({
+      _id: message._id,
+      sender: {
+        _id: req.user._id,
+        name: req.user.username,
+        imageUrl: req.user.avatar
+      },
+      subscribeId: channel._id,
+      imageUrl: message.imageUrl,
+      createdAt: message.createdAt,
+    }, channel._id.toString());
+
+    const sendTo = channel.userId._id.toString() === req.user._id ?
+      channel.friendId._id.toString() : channel.userId._id.toString();
+
+    this.realTimeGateway.handleSendNotification({
+      type: 'New message',
+      subscribe: channel._id.toString(),
+      messageFrom: req.user.username
+    }, sendTo);
+
     return {
       sender: req.user.username,
       content: message.imageUrl,
@@ -87,7 +108,7 @@ export class ChannelMessagesService {
         path: 'sender',
         select: 'name imageUrl'
       })
-      .select('content createdAt');
+      .select('content imageUrl createdAt');
 
     return messages;
   }

@@ -18,11 +18,15 @@
             margin: 0;
         }
 
-        img {
+        .avatar {
+            position: relative;
             width: 70px;
             height: 70px;
-            object-fit: cover;
-            border-radius: 50%;
+
+            img {
+                object-fit: cover;
+                border-radius: 50%;
+            }
         }
     }
 

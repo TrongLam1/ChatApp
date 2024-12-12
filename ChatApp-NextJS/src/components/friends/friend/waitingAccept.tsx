@@ -44,9 +44,10 @@ export default function WaitingAcceptComponent(props: any) {
             {user &&
                 <div className='friend'>
                     <div className='accept-info'>
-                        <Image src={user?.avatar ? user?.avatar : avatar}
-                            width={50} height={50} alt='' />
-                        <div className='texts'>
+                        <div className='image-container col-lg-4'>
+                            <Image src={user?.imageUrl ? user?.imageUrl : avatar} fill alt='' />
+                        </div>
+                        <div className='texts col-lg-8'>
                             <span>{user?.name}</span>
                         </div>
                     </div>

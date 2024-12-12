@@ -23,7 +23,8 @@ export default function FriendComponent(props: any) {
             setContactObject({
                 id: contact.id,
                 name: contact.name,
-                channelId: res.data.channelId
+                channelId: res.data.channelId,
+                avatar: contact.avatar
             });
         } else { toast.error(res.message); }
     };
@@ -69,9 +70,13 @@ export default function FriendComponent(props: any) {
     return (
         <div className='friend' onClick={handleSubscribe}>
             {contact.isGroup ?
-                <Image src={group} alt='' width={50} height={50} /> :
-                <Image src={contact.avatar !== null ? contact.avatar : avatar} alt=''
-                    width={50} height={50} />}
+                <div className="image-container col-4">
+                    <Image src={group} alt='' fill />
+                </div> :
+                <div className="image-container col-8">
+                    <Image src={contact.avatar !== null ? contact.avatar : avatar} alt=''
+                        fill />
+                </div>}
             <div className='texts'>
                 <div className='info'>
                     <div className='title-info'>

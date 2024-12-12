@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import './listFriendsComponent.scss';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faMinus, faPlus, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faMinus, faPlus, faRotateRight, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import UserInfoComponent from "@/components/userInfo/userInfoComponent";
 import { useTab } from "@/providers/tabProvider";
 import FriendComponent from "../friend/friendComponent";
@@ -11,7 +11,8 @@ import AddFriendModal from "@/components/modal/addFriend/addFriendModal";
 import { useRouter } from "next/navigation";
 import CreateGroupModal from "@/components/modal/createGroup/createGroupModal";
 import WaitingAcceptComponent from "../friend/waitingAccept";
-import { FindUsersByName } from "@/app/api/friendshipApi";
+import { CountRequestFriends, FindUsersByName, GetListFriends, GetListRequestFriends } from "@/app/api/friendshipApi";
+import { GetListGroupsOfUser } from "@/app/api/groupApi";
 
 export default function ListFriendsComponent(props: any) {
     const router = useRouter();
@@ -23,7 +24,7 @@ export default function ListFriendsComponent(props: any) {
     const [username, setUsername] = useState('');
     const [openModalUserInfo, setOpenModalUserInfo] = useState(false);
     const [openModalCreateGroup, setOpenModalCreateGroup] = useState(false);
-    const [listFriends, setListFriends] = useState(listContacts);
+    const [listFriends, setListFriends] = useState<any>();
 
     useEffect(() => {
         setListFriends(listContacts);
@@ -40,9 +41,31 @@ export default function ListFriendsComponent(props: any) {
         }
     };
 
+    const keyDownFindFriend = async (e) => {
+        if (e.key === 'Enter') {
+            await handleFindFriendByUsername();
+        }
+
+        return;
+    };
+
     const handleNavigateTab = (tab: string) => {
         setTab(tab);
         router.push(`?tab=${tab}`);
+    };
+
+    const refreshListFriends = async () => {
+        let res = null;
+        if (tab === 'friends') {
+            res = await GetListFriends(token);
+        } else if (tab === 'groups') {
+            res = await GetListGroupsOfUser(token);
+        } else {
+            res = await GetListRequestFriends(token);
+            const resCount = await CountRequestFriends(token);
+            setCount(resCount.data);
+        }
+        setListFriends(res.data);
     };
 
     return (
@@ -50,10 +73,12 @@ export default function ListFriendsComponent(props: any) {
             <UserInfoComponent token={token} user={user} />
             <div className='search'>
                 <div className='search-bar'>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} onClick={handleFindFriendByUsername} />
+                    <FontAwesomeIcon icon={faMagnifyingGlass}
+                        onClick={handleFindFriendByUsername} />
                     <input type='text' placeholder='Enter username...'
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        onKeyDown={keyDownFindFriend}
                     />
                 </div>
                 {tab !== 'groups' ?
@@ -88,6 +113,9 @@ export default function ListFriendsComponent(props: any) {
                 </div>
             </div>
             <div className='list-chats'>
+                <div className="refresh">
+                    <FontAwesomeIcon icon={faRotateRight} onClick={refreshListFriends} />
+                </div>
                 {listFriends && listFriends.length > 0 ?
                     listFriends.map((item: any, index: number) => {
                         let contact = null;

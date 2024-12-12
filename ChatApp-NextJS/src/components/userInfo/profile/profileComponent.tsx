@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from 'react-toastify';
 import './profileComponent.scss';
 import UpdateAvatarComponent from './updateAvatarComponent';
+import Image from 'next/image';
 
 export default function ProfileComponent(props: any) {
     const router = useRouter();
@@ -44,7 +45,7 @@ export default function ProfileComponent(props: any) {
                         <div className='user-info-body'>
                             <div className='avatar-user-container'>
                                 <div className='avatar'>
-                                    <img src={user?.avatar ?? avatar} alt='' />
+                                    <Image src={user?.avatar ?? avatar} fill alt='' />
                                 </div>
                                 <div className='btn-change-avatar'>
                                     <label onClick={() => setIsUpdateAvatar(!isUpdateAvatar)} >

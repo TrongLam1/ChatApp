@@ -9,12 +9,12 @@ export async function ChannelSendMessage(token: string, body: ISendMessage) {
     });
 };
 
-export async function ChannelSendImage(token: string, body: ISendMessage) {
+export async function ChannelSendImage(token: string, formData: any) {
     return await sendRequestFile<IBackendRes<any>>({
         url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/channel-messages/post-image`,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
-        body
+        body: formData
     });
 };
 
@@ -35,12 +35,12 @@ export async function GroupSendMessage(token: string, body: ISendMessage) {
     });
 };
 
-export async function GroupSendImage(token: string, body: ISendMessage) {
+export async function GroupSendImage(token: string, formData: any) {
     return await sendRequestFile<IBackendRes<any>>({
         url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/group-messages/post-image`,
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
-        body
+        body: formData
     });
 };
 

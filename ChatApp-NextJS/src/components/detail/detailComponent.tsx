@@ -16,10 +16,7 @@ import './detailComponent.scss';
 import MemberComponent from './memberGroup/memberComponent';
 
 export default function DetailComponent(props: any) {
-    const router = useRouter();
-
     const { token } = props;
-    const { tab } = useTab();
     const { contactObject, setContactObject } = useContactObject();
 
     const [avatar, setAvatar] = useState<any>();
@@ -66,7 +63,7 @@ export default function DetailComponent(props: any) {
         const res = await QuitGroup(token, contactObject.id);
         if (res.statusCode === 200) {
             toast.success(res.data);
-            router.refresh();
+            setContactObject(null);
         } else { toast.error(res.message); }
     }
 
@@ -76,7 +73,9 @@ export default function DetailComponent(props: any) {
                 {contactObject &&
                     <>
                         <div className='user'>
-                            <Image src={avatar} alt='avatar' />
+                            <div className='avatar'>
+                                <Image src={avatar} fill alt='avatar' />
+                            </div>
                             <h3>{contactObject.name}</h3>
                         </div>
                         <div className='info'>

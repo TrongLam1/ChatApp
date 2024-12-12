@@ -55,7 +55,7 @@ export class GroupMembersService {
             .find({ group: group._id })
             .populate({
                 path: 'user',
-                select: '_id name email'
+                select: '_id name email imageUrl'
             })
             .select('_id');
 

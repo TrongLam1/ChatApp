@@ -35,8 +35,8 @@ export default function CreateGroupModal(props: any) {
     }
 
     const handleCreateNewGroup = async () => {
-        if (listAddGroup.length < 1) {
-            alert("At least 2 users to create a group");
+        if (listAddGroup.length <= 1) {
+            toast.error("Tối thiểu 2 người bạn để tạo nhóm.");
             return;
         }
 
@@ -47,7 +47,7 @@ export default function CreateGroupModal(props: any) {
 
         const res = await CreateGroup(token, body);
         if (res.statusCode === 201) {
-            toast.success('Create new group successfully.');
+            toast.success('Tạo nhóm thành công.');
             setOpen(false);
         } else {
             toast.error(res.message);

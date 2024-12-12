@@ -43,7 +43,9 @@ export default function UserAddInfo(props: any) {
             {userInfo &&
                 <>
                     <div className='detail'>
-                        <Image src={avatar} alt='' />
+                        <div className='avatar'>
+                            <Image src={userInfo?.imageUrl ? userInfo?.imageUrl : avatar} fill alt='' />
+                        </div>
                         <span>{userInfo?.name}</span>
                     </div>
                     {<>
