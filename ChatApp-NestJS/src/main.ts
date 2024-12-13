@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 declare const module: any;
 
@@ -25,6 +26,16 @@ async function bootstrap() {
       credentials: true
     }
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('Chat Application APIs Documentation')
+    .setDescription('Chat Application APIs Description')
+    .addBearerAuth()
+    .setVersion('1.0')
+    .addTag('chat')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(port);
 
