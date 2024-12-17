@@ -61,13 +61,13 @@ export default function UploadImageModal(props: any) {
             </div>
             <div className='btn'>
                 <div className='btn-upload-img'>
-                    <label htmlFor='img-preview' >Upload Image</label>
+                    <label htmlFor='img-preview' >Tải ảnh</label>
                     <input id='img-preview' key={preview} type="file"
                         accept="image/*" onChange={handleChange} />
                 </div>
                 {hasImg &&
                     <div className='btn-send-img' onClick={handleSendImg}>
-                        <p>Send Img</p>
+                        <p>Gửi</p>
                     </div>
                 }
             </div>

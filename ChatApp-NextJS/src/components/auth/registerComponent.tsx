@@ -2,12 +2,15 @@
 
 import { Register } from '@/app/api/userApi';
 import logo from '@/assets/images/logo.png';
+import { CSpinner } from '@coreui/react';
 import Image from 'next/image';
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from "react";
 import { toast } from 'react-toastify';
 
 export default function RegisterComponent() {
+    const router = useRouter();
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -18,12 +21,12 @@ export default function RegisterComponent() {
         e.preventDefault();
 
         if (!email || !password || !username) {
-            toast.error("Please do not leave it blank.");
+            toast.error("Vui lòng điền đầy đủ thông tin.");
             return;
         }
 
         if (!validateEmail(email)) {
-            toast.error("Invalid email");
+            toast.error("Email không hợp lệ.");
             return;
         }
 
@@ -33,7 +36,9 @@ export default function RegisterComponent() {
 
         if (res.statusCode !== 201) {
             toast.error(res.message);
-            return;
+        } else {
+            toast.success("Đăng ký tài khoản thành công.");
+            router.push('/login');
         }
 
         setLoadingApi(false);
@@ -58,7 +63,7 @@ export default function RegisterComponent() {
                                     </div>
                                 </div>
                                 <h2 className="fs-2 fw-bold text-center text-secondary mb-4">
-                                    Sign Up
+                                    Đăng ký
                                 </h2>
                                 <form onSubmit={(e) => handleSignUp(e)}>
                                     <div className="row gy-2 overflow-hidden">
@@ -68,7 +73,7 @@ export default function RegisterComponent() {
                                                     onChange={(e) => setUsername(e.target.value)}
                                                     required />
                                                 <label htmlFor="username" className="form-label">
-                                                    Username
+                                                    Tên người dùng
                                                 </label>
                                             </div>
                                         </div>
@@ -84,21 +89,22 @@ export default function RegisterComponent() {
                                             <div className="form-floating mb-3">
                                                 <input type="password" className="form-control" name="password" id="password"
                                                     onChange={(e) => setPassword(e.target.value)}
-                                                    placeholder="Password..." required />
-                                                <label htmlFor="password" className="form-label">Password</label>
+                                                    placeholder="Mật khẩu ..." required />
+                                                <label htmlFor="password" className="form-label">Mật khẩu</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="d-grid my-3">
-                                                <button className="btn btn-primary btn-lg" type="submit">
-                                                    {loadingApi && <i className="fa-solid fa-sync fa-spin loader"></i>}
-                                                    Sign Up
+                                                <button className="btn btn-primary btn-lg" type="submit" disabled={loadingApi ? true : false}>
+                                                    {loadingApi &&
+                                                        <CSpinner color="light" size="sm" className='me-3' style={{ width: '1.3rem', height: '1.3rem' }} />}
+                                                    Đăng ký
                                                 </button>
                                             </div>
                                         </div>
                                         <div className="col-12">
-                                            <p className="m-0 text-secondary text-center">Do you already have an account?
-                                                <Link href='/login' className="link-primary text-decoration-none"> Sign In</Link>
+                                            <p className="m-0 text-secondary text-center">Bạn đã có tài khoản?
+                                                <Link href='/login' className="link-primary text-decoration-none"> Đăng nhập.</Link>
                                             </p>
                                         </div>
                                     </div>

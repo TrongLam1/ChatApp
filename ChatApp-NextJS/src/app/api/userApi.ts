@@ -37,3 +37,7 @@ export async function ChangeAvatar(token: string, formData: any) {
         body: formData
     });
 }
+
+export async function LoginWithGoogle() {
+    return `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google/login`;
+}

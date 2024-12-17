@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { Public, ResponseMessage } from 'src/decorator/decorator';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
@@ -6,6 +6,7 @@ import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { GoogleAuthGuard } from './guard/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -40,5 +41,19 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logout account.' })
   async logout(@Req() req) {
     return await this.userService.logout(req.user);
+  }
+
+  @Get('google/login')
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  googleLogin() { }
+
+  @Get('google/callback')
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  async googleCallBack(@Req() req, @Res() res) {
+    const response = await this.authService.signIn(req.user);
+    const string = JSON.stringify(response);
+    res.redirect(`http://localhost:3000/login?response=${string}`);
   }
 }

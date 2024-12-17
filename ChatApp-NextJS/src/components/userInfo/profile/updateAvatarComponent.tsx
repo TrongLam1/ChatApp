@@ -49,7 +49,7 @@ export default function UpdateAvatarComponent(props: any) {
     return (
         <div className='user-info-modal'>
             <div className='header'>
-                <h4>Update Avatar</h4>
+                <h4>Cập nhật ảnh đại diện</h4>
                 <FontAwesomeIcon icon={faCircleXmark} onClick={() => setIsUpdateAvatar(false)} />
             </div>
             <div className='user-info-body'>
@@ -59,7 +59,7 @@ export default function UpdateAvatarComponent(props: any) {
                     </div>
                     <div className='btn-change-avatar-modal'>
                         <label htmlFor='avatar-preview' >
-                            Upload Avatar
+                            Tải ảnh
                         </label>
                         <input id='avatar-preview' key={preview} type="file"
                             accept="image/*" onChange={handleChange} />
@@ -68,7 +68,7 @@ export default function UpdateAvatarComponent(props: any) {
                         <div className="save-avatar">
                             <button onClick={handleUpdateAvatar} disabled={loadingApi ? true : false}>
                                 {loadingApi && <i className="fa-solid fa-sync fa-spin loader"></i>}
-                                Save
+                                Lưu
                             </button>
                         </div>}
                 </div>

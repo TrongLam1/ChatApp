@@ -26,15 +26,15 @@ export default function AddFriendModal(props: any) {
     return (
         <div className='add-user-modal'>
             <form onSubmit={(e) => handleFindByName(e)}>
-                <input type='text' placeholder='Username' value={nameSearch}
+                <input type='text' placeholder='Nhập tên người dùng ...' value={nameSearch}
                     onChange={(e) => setNameSearch(e.target.value)} />
-                <button className='search-btn'>Search</button>
+                <button className='search-btn'>Tìm</button>
             </form>
             <div className='list-users'>
                 {users && users.length > 0 ?
                     users.map((user: any, index: number) => {
                         return (<UserAddInfo key={`user-${index}`} user={user} token={token} />)
-                    }) : <div>Not found user</div>
+                    }) : <div>Không có thông tin người dùng.</div>
                 }
             </div>
         </div>

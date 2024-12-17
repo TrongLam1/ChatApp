@@ -154,7 +154,7 @@ export default function ChatComponent(props: any) {
                             <button className='send-button'
                                 onClick={handleSubmitMessage}
                             >
-                                Send
+                                Gửi
                             </button>
                         </div>
                     </>

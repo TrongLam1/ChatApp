@@ -58,11 +58,11 @@ export default function CreateGroupModal(props: any) {
         <>
             {open &&
                 (<div className='modal-create-group'>
-                    <h4>Create New Group</h4>
+                    <h4>Tạo nhóm mới</h4>
                     <form onSubmit={(e) => handleFindByName(e)}>
-                        <input type='text' placeholder='Enter username...' value={nameSearch}
+                        <input type='text' placeholder='Nhập tên người dùng ...' value={nameSearch}
                             onChange={(e) => setNameSearch(e.target.value)} />
-                        <button className='search-btn'>Search</button>
+                        <button className='search-btn'>Tìm</button>
                     </form>
                     <div className='user'>
                         {listFriends && listFriends.length > 0 &&
@@ -74,9 +74,9 @@ export default function CreateGroupModal(props: any) {
                     </div>
                     <div className='btn-create'>
                         <input type='text' value={groupName}
-                            placeholder="Enter group's name..."
+                            placeholder="Nhập tên nhóm ..."
                             onChange={(e) => setGroupName(e.target.value)} />
-                        <button onClick={handleCreateNewGroup}>Create</button>
+                        <button onClick={handleCreateNewGroup}>Tạo</button>
                     </div>
                 </div>)
             }

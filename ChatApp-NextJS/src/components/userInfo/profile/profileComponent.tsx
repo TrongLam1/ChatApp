@@ -39,7 +39,7 @@ export default function ProfileComponent(props: any) {
                 !isUpdateAvatar ? (
                     <div className='user-info-modal'>
                         <div className='header'>
-                            <h4>User&apos;s Profile</h4>
+                            <h4>Thông tin cá nhân</h4>
                             <FontAwesomeIcon icon={faCircleXmark} onClick={() => setOpen(false)} />
                         </div>
                         <div className='user-info-body'>

@@ -9,7 +9,7 @@ const LoginPage = ({ searchParams }: {
 }) => {
 
     return (
-        <LoginComponent />
+        <LoginComponent userString={searchParams.response} />
     )
 };
 

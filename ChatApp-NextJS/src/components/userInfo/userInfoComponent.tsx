@@ -32,9 +32,9 @@ export default function UserInfoComponent(props: any) {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => setOpen(!open)}>Profile</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setOpen(!open)}>Thông tin cá nhân</Dropdown.Item>
                             <Dropdown.Item onClick={() => signOut({ callbackUrl: '/login' })}>
-                                Logout
+                                Đăng xuất
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>

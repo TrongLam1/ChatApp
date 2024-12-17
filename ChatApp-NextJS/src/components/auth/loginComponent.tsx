@@ -1,19 +1,28 @@
 'use client'
 
+import google from '@/assets/images/google.png';
 import logo from '@/assets/images/logo.png';
 import authenticate from '@/utils/actions';
+import { CSpinner } from '@coreui/react';
 import Image from 'next/image';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import style from './loginComponent.module.scss';
+import { LoginWithGoogle } from '@/app/api/userApi';
 
-export default function LoginComponent() {
+export default function LoginComponent(props: any) {
     const router = useRouter();
 
+    const { userString } = props;
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loadingApi, setLoadingApi] = useState(false);
+
+    useEffect(() => {
+        if (userString !== undefined) handleLoginGoogle();
+    }, []);
 
     const validateEmail = (email: string) => {
         // Regular expression for validating an email
@@ -25,12 +34,12 @@ export default function LoginComponent() {
         e.preventDefault();
 
         if (!email || !password) {
-            toast.error("Missing email or password");
+            toast.error("Email hoặc mật khẩu không được để trống.");
             return;
         }
 
         if (!validateEmail(email)) {
-            toast.error("Invalid email");
+            toast.error("Email không hợp lệ.");
             return;
         }
 
@@ -47,6 +56,16 @@ export default function LoginComponent() {
         setLoadingApi(false);
     }
 
+    const redirectLoginGoogle = async () => {
+        const url = await LoginWithGoogle();
+        router.push(url);
+    };
+
+    const handleLoginGoogle = async () => {
+        await authenticate(userString, "");
+        router.push("/");
+    };
+
     return (
         <section className="bg-light py-3 py-md-5">
             <div className="container">
@@ -60,7 +79,7 @@ export default function LoginComponent() {
                                     </div>
                                 </div>
                                 <h2 className="fs-2 fw-bold text-center text-secondary mb-4">
-                                    Sign In
+                                    Đăng nhập
                                 </h2>
                                 <form onSubmit={(e) => handleLogin(e)}>
                                     <div className="row gy-2 overflow-hidden">
@@ -79,23 +98,35 @@ export default function LoginComponent() {
                                                     className="form-control"
                                                     name="password" id="password"
                                                     onChange={(e) => setPassword(e.target.value)}
-                                                    placeholder="Password..." required />
-                                                <label htmlFor="password" className="form-label">Password</label>
+                                                    placeholder="Mật khẩu ..." required />
+                                                <label htmlFor="password" className="form-label">Mật khẩu</label>
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="d-grid my-3">
-                                                <button className="btn btn-primary btn-lg" type="submit">
-                                                    {loadingApi && <i className="fa-solid fa-sync fa-spin loader"></i>}
-                                                    Sign In
+                                                <button className="btn btn-primary btn-lg" type="submit" disabled={loadingApi ? true : false}>
+                                                    {loadingApi &&
+                                                        <CSpinner color="light" size="sm" className='me-3' style={{ width: '1.3rem', height: '1.3rem' }} />}
+                                                    Đăng nhập
                                                 </button>
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <p className="m-0 text-secondary text-center">
-                                                Do not have an account?
-                                                <Link href='/register' className="link-primary text-decoration-none"> Sign Up</Link>
+                                                Bạn chưa có tài khoản?
+                                                <Link href='/register' className="link-primary text-decoration-none"> Đăng ký.</Link>
                                             </p>
+                                        </div>
+                                        <div className={style.gSignInButton}
+                                            onClick={redirectLoginGoogle}>
+                                            <div className={style.contentWrapper}>
+                                                <div className={style.logoWrapper}>
+                                                    <Image src={google} fill alt='google' />
+                                                </div>
+                                                <span className={style.textContainer}>
+                                                    <span>Đăng nhập với Google</span>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>

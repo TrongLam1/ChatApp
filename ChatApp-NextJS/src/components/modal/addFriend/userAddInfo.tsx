@@ -51,15 +51,15 @@ export default function UserAddInfo(props: any) {
                     {<>
                         {status === "waiting" &&
                             <button className='cancel-friend-btn' onClick={handleCancelAddFriend}>
-                                Cancel
+                                Hủy
                             </button>}
                         {status === "pending" &&
                             <button className='accept-friend-btn' onClick={handleAcceptFriend}>
-                                Accept
+                                Đồng ý
                             </button>}
                         {!status &&
                             <button className='add-friend-btn' onClick={handleSendRequestAddFriend}>
-                                Add
+                                Thêm
                             </button>}
                     </>}
                 </>

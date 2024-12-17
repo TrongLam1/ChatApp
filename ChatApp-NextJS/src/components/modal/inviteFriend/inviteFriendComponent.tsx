@@ -60,11 +60,11 @@ export default function InviteFriendComponent(props: any) {
 
     return (
         <div className='modal-create-group'>
-            <h4>Add Friends To Group</h4>
+            <h4>Thêm bạn bè vào nhóm</h4>
             <form onSubmit={(e) => handleFindByName(e)}>
-                <input type='text' placeholder='Enter username...' value={nameSearch}
+                <input type='text' placeholder='Nhập tên người dùng ...' value={nameSearch}
                     onChange={(e) => setNameSearch(e.target.value)} />
-                <button className='search-btn'>Search</button>
+                <button className='search-btn'>Tìm</button>
             </form>
             <div className='user'>
                 {listFriends && listFriends.length > 0 &&
@@ -75,7 +75,7 @@ export default function InviteFriendComponent(props: any) {
                 }
             </div>
             <div className='btn-add'>
-                <button onClick={handleAddUsersToGroup}>Add</button>
+                <button onClick={handleAddUsersToGroup}>Thêm</button>
             </div>
         </div>
     );

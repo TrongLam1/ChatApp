@@ -29,21 +29,15 @@ export class UsersService {
 
     const hashPassword = await hashPasswordHelper(password);
 
-    let user;
-
     if (provider !== null) {
-      user = await this.userModel.create({
+      return await this.userModel.create({
         name: username, email, password: hashPassword, accountType: provider
       });
     } else {
-      user = await this.userModel.create({
+      return await this.userModel.create({
         name: username, email, password: hashPassword
       });
     }
-
-    return {
-      id: user._id, email: user.email, username: user.name
-    };
   }
 
   async resetPassword(user, newPassword: string) {
@@ -66,10 +60,7 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userModel.findOne({ email });
-    if (!user) throw new NotFoundException("Không tìm thấy thông tin người dùng.");
-
-    return user;
+    return await this.userModel.findOne({ email });
   }
 
   async findOneById(_id: string) {

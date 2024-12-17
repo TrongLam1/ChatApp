@@ -75,7 +75,7 @@ export default function ListFriendsComponent(props: any) {
                 <div className='search-bar'>
                     <FontAwesomeIcon icon={faMagnifyingGlass}
                         onClick={handleFindFriendByUsername} />
-                    <input type='text' placeholder='Enter username...'
+                    <input type='text' placeholder='Nhập tên người dùng ...'
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         onKeyDown={keyDownFindFriend}
@@ -100,15 +100,15 @@ export default function ListFriendsComponent(props: any) {
             <div className='tab'>
                 <div>
                     <button className={`${tab === 'friends' ? 'active' : ''}`}
-                        onClick={() => handleNavigateTab('friends')}>Friends</button>
+                        onClick={() => handleNavigateTab('friends')}>Bạn bè</button>
                 </div>
                 <div>
                     <button className={`${tab === 'groups' ? 'active' : ''}`}
-                        onClick={() => handleNavigateTab('groups')}>Groups</button>
+                        onClick={() => handleNavigateTab('groups')}>Nhóm</button>
                 </div>
                 <div className='amount-add-friend'>
                     <button className={`${tab === 'accepts' ? 'active' : ''}`}
-                        onClick={() => handleNavigateTab('accepts')}>Accepts</button>
+                        onClick={() => handleNavigateTab('accepts')}>Kết bạn</button>
                     <div className='amount'>{countRequest}</div>
                 </div>
             </div>
@@ -136,7 +136,7 @@ export default function ListFriendsComponent(props: any) {
                             (<FriendComponent contact={contact} key={`friend-${index}`}
                                 token={token}
                             />)
-                    }) : <div className='no-content'>Empty</div>
+                    }) : <div className='no-content'>Không có thông tin.</div>
                 }
             </div>
             {openModalUserInfo && <AddFriendModal token={token} />}

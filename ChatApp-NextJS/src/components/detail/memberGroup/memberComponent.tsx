@@ -30,7 +30,7 @@ export default function MemberComponent(props: any) {
     };
 
     const confirmModal = () => {
-        setMessage(<>Are you sure remove <strong>&quot;{user.name}&quot;</strong> from group?</>);
+        setMessage(<>Bạn xác nhận muốn xóa thành viên <strong>&quot;{user.name}&quot;</strong> khỏi nhóm?</>);
         setIsOpen(true);
     };
 

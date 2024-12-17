@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { comparePasswordHelper } from 'src/helpers/utils';
+import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
@@ -20,11 +21,11 @@ export class AuthService {
     return user;
   }
 
-  // async validateGoogleUser(googleUser: CreateUserDto) {
-  //   const user = await this.userService.findOneByEmail(googleUser.email);
-  //   if (user) return user;
-  //   return await this.userService.register(googleUser);
-  // }
+  async validateGoogleUser(googleUser: CreateUserDto) {
+    const user = await this.userService.findOneByEmail(googleUser.email);
+    if (user) return user;
+    return await this.userService.register(googleUser);
+  }
 
   async signIn(user): Promise<any> {
     const payload = {

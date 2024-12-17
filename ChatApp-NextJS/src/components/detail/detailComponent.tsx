@@ -81,19 +81,19 @@ export default function DetailComponent(props: any) {
                         <div className='info'>
                             <div className='option'>
                                 <div className='title'>
-                                    <span>Chat Settings</span>
+                                    <span>Cài đặt</span>
                                 </div>
                             </div>
                             <div className='option'>
                                 <div className='title'>
-                                    <span>Privacy & help</span>
+                                    <span>Riêng tư</span>
                                 </div>
                             </div>
                             {contactObject.isGroup &&
                                 <div className='option'>
                                     <div className='title'>
                                         <div className='members-container'>
-                                            <span>Members</span>
+                                            <span>Thành viên</span>
                                             <FontAwesomeIcon icon={faUserPlus}
                                                 onClick={() => setOpenModal(!openModal)} />
                                         </div>
@@ -118,7 +118,7 @@ export default function DetailComponent(props: any) {
                                 </div>
                             }
                             {contactObject.isGroup &&
-                                <button type='button' onClick={handleQuitOutGroup}>Quit</button>
+                                <button type='button' onClick={handleQuitOutGroup}>Thoát</button>
                             }
                         </div>
                     </>
